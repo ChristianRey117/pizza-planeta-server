@@ -1,7 +1,8 @@
 const express = require("express");
 const conexion = require("./database");
 const app = express();
-const routes = require("./routes");
+const sucursalRoutes = require("./routes/route-sucursales/sucursales-routes");
+
 const cors = require("cors");
 
 app.use(
@@ -23,4 +24,4 @@ app.get("/", (req, res) => {
   res.send("My api node");
 });
 
-app.use("/sucursales", routes);
+app.use("/sucursales", sucursalRoutes);
