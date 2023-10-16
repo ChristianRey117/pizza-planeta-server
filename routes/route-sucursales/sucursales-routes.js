@@ -28,7 +28,7 @@ routes.get("/", (req, res) => {
       " JOIN supplier ON branch.id_supplier = supplier.id_supplier",
     (err, rows) => {
       if (err) {
-        throw err;
+        res.send({ err: "Error al conectar con la base de datos" });
       }
       res.json(rows);
     }
@@ -36,5 +36,7 @@ routes.get("/", (req, res) => {
 });
 
 routes.post("/add", uploadImage.single("image"), controller.createSucursal);
+
+routes.delete("/delete/:id_branch", controller.deleteSucursal);
 
 module.exports = routes;
