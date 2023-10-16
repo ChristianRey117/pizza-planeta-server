@@ -23,7 +23,7 @@ const createSucursal = async (req, res, next) => {
 };
 
 
-const deleteSucursal = (req, res) => {
+const deleteSucursal = async (req, res) => {
   var id_branch = req.params.id_branch;
   eliminarImagen(id_branch); //se envia el id
 
@@ -37,6 +37,75 @@ const deleteSucursal = (req, res) => {
   });
 };
 
+
+const updateSucursal = (req, res) => {
+  var id_branch = req.params.id_branch;
+  console.log(id_branch);
+  //console.log(req.body);
+  var data = {
+    branch_name: req.body.branch_name,
+    branch_direction: req.body.branch_direction,
+    id_supplier: req.body.id_supplier,
+    work_personnel: req.body.work_personnel,
+    image: req.file.filename,
+  };
+    
+  console.log(data);
+  actualizarImagen(id_branch, data);
+
+  conexion.query("UPDATE branch SET ? WHERE id_branch = ?", [data, id_branch], (err, row) => {
+    if (err) 
+    {
+      res.send({ err: "Error al conectar con la base de datos" });
+    }
+    res.send("Actualizacion exitosa");
+  });
+}
+
+
+const actualizarImagen = (id_branch, data) => {
+  // Consulta para obtener el nombre de la imagen
+  conexion.query("SELECT image FROM branch WHERE id_branch = ?", [id_branch], (err, resultado) => {
+    if (err) 
+    {
+      console.error('Error al obtener el nombre de la imagen:', err);
+    }
+
+    if (resultado.length === 0) 
+    {
+      console.error('Imagen no encontrada');
+    }
+
+    const nombreImagenBD = resultado[0].image;
+    console.log('Imagen BD: ', nombreImagenBD);
+    const imagenProyecto = data.image;
+    console.log('Imagen Proyecto: ', imagenProyecto);
+
+    if(nombreImagenBD === imagenProyecto)
+    {
+      console.log('los nombres de imagen coinciden')
+    }
+    else
+    {
+      console.log('los nombres de imagen NO coinciden')
+     
+      const rutaImagen = `public/images/${nombreImagenBD}`;
+      console.log('ruta: ', rutaImagen);
+
+
+      //fs.unlink(archivo a eliminar, error)
+      fs.unlink(rutaImagen, (error) => {
+        if (error) 
+        {
+          console.error('Error al eliminar la imagen:', error);
+        }
+        console.log('Imagen eliminada exitosamente');
+      });
+      
+    }
+    
+  });
+};
 
 
 const eliminarImagen = (id_branch) => {
@@ -74,4 +143,4 @@ const eliminarImagen = (id_branch) => {
 
 
 
-module.exports = { createSucursal, deleteSucursal };
+module.exports = { createSucursal, deleteSucursal, updateSucursal };

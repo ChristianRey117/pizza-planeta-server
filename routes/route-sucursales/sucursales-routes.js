@@ -9,8 +9,8 @@ const storage = multer.diskStorage({
   destination: "public/images",
   filename: (req, file, cb) => {
     cb(
-      null,
-      file.fieldname + "_" + Date.now() + path.extname(file.originalname)
+      //null,      file.fieldname + "_" + Date.now() + path.extname(file.originalname)
+      null,      file.fieldname + "_"  + file.originalname
     );
   },
 });
@@ -38,5 +38,7 @@ routes.get("/", (req, res) => {
 routes.post("/add", uploadImage.single("image"), controller.createSucursal);
 
 routes.delete("/delete/:id_branch", controller.deleteSucursal);
+
+routes.put("/update/:id_branch", uploadImage.single("image"), controller.updateSucursal);
 
 module.exports = routes;
