@@ -35,6 +35,22 @@ routes.get("/", (req, res) => {
   );
 });
 
+routes.get("/:id_branch", (req, res) =>{
+  var id = req.params.id_branch;
+  conexion.query(
+    "SELECT branch.id_branch, branch.branch_name, branch.branch_direction, branch.work_personnel, branch.image, supplier.supplier_name AS supplier" +
+    " FROM branch" +
+    " JOIN supplier ON branch.id_supplier = supplier.id_supplier" +
+    " WHERE branch.id_branch = ?", 
+    [id], (err, rows) => {
+      if(err) {
+        res.send({err: "No se encontro el registro"});
+      }
+      res.json(rows);      
+    }
+  );
+})
+
 routes.post("/add", uploadImage.single("image"), controller.createSucursal);
 
 routes.delete("/delete/:id_branch", controller.deleteSucursal);
