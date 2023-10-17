@@ -2,6 +2,9 @@ const express = require("express");
 const conexion = require("./database");
 const app = express();
 const sucursalRoutes = require("./routes/route-sucursales/sucursales-routes");
+const proveedorRoutes = require("./routes/route-proveedores/proveedores-routes");
+
+
 
 const cors = require("cors");
 
@@ -27,3 +30,5 @@ app.get("/", (req, res) => {
 });
 
 app.use("/sucursales", sucursalRoutes);
+app.use("/proveedores", proveedorRoutes);
+
