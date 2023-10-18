@@ -31,10 +31,13 @@ const deleteProveedor = async (req, res) => {
 const updateProveedor = (req, res) => {
     var id_supplier = req.params.id_supplier;
     var data = {
-        supplier_name: req.body.supplier_name,
-        supplier_product: req.body.supplier_product,
-        image: req.file.filename,
-    };
+          supplier_name: req.body.supplier_name,
+          supplier_product: req.body.supplier_product,
+      };
+    
+    if(req?.file?.filename !== undefined){
+      data={...data, image:req.file.filename }
+    }
     
   actualizarImagen(id_supplier, data);
 
@@ -47,61 +50,66 @@ const updateProveedor = (req, res) => {
   });
 }
 
-const eliminarImagen = (id_supplier) => {
-    conexion.query("SELECT image FROM supplier WHERE id_supplier = ?", [id_supplier], (err, resultado) => {
-        if (err) 
-        {
-          console.error('Error al obtener el nombre de la imagen:', err);
-        }
-        if (resultado.length === 0) 
-        {
-          console.error('Imagen no encontrada');
-        }
 
-        const nombreImagen = resultado[0].image;
-        const rutaImagen = `public/images/${nombreImagen}`;
-
-        fs.unlink(rutaImagen, (error) => {
-          if (error) 
-          {
-            console.error('Error al eliminar la imagen:', error);
-          }
-          console.log('Imagen eliminada exitosamente');
-        });
-    });
-}
 
 const actualizarImagen = (id_supplier, data) => {
-    conexion.query("SELECT image FROM supplier WHERE id_supplier = ?", [id_supplier], (err, resultado) => {
-        if (err) 
-        {
-            console.error('Error al obtener el nombre de la imagen:', err);
-        }
-        if (resultado.length === 0) 
-        {
-            console.error('Imagen no encontrada');
-        }
-            const nombreImagenBD = resultado[0].image;
-            const imagenProyecto = data.image;
+  conexion.query("SELECT image FROM supplier WHERE id_supplier = ?", [id_supplier], (err, resultado) => {
+    if (err) 
+    {
+      console.error('Error al obtener el nombre de la imagen:', err);
+   }
+    if (resultado.length === 0) 
+    {
+      console.error('Imagen no encontrada');
+    }
+    const nombreImagenBD = resultado[0].image;
+    const imagenProyecto = data.image;
 
-            if(nombreImagenBD === imagenProyecto)
+    if(imagenProyecto == null)
+    {
+      console.log('No viene la imagen', imagenProyecto)
+    }
+    else
+   {
+      console.log('Si viene la imagen')
+              
+      const rutaImagen = `public/images/${nombreImagenBD}`;
+      console.log('ruta: ', rutaImagen);
+          
+      fs.unlink(rutaImagen, (error) => {
+        if (error) 
         {
-            console.log('los nombres de imagen coinciden')
+          console.error('Error al eliminar la imagen:', error);
         }
-        else
-        {
-            console.log('los nombres de imagen NO coinciden')
-            const rutaImagen = `public/images/${nombreImagenBD}`;
-
-            fs.unlink(rutaImagen, (error) => {
-            if (error) 
-            {
-                console.error('Error al eliminar la imagen:', error);
-            }
-            console.log('Imagen eliminada exitosamente');
-            });
-        }
-    });
+        console.log('Imagen eliminada exitosamente');
+      });
+    }
+  });
 };
+
+
+const eliminarImagen = (id_supplier) => {
+  conexion.query("SELECT image FROM supplier WHERE id_supplier = ?", [id_supplier], (err, resultado) => {
+      if (err) 
+      {
+        console.error('Error al obtener el nombre de la imagen:', err);
+      }
+      if (resultado.length === 0) 
+      {
+        console.error('Imagen no encontrada');
+      }
+
+      const nombreImagen = resultado[0].image;
+      const rutaImagen = `public/images/${nombreImagen}`;
+
+      fs.unlink(rutaImagen, (error) => {
+        if (error) 
+        {
+          console.error('Error al eliminar la imagen:', error);
+        }
+        console.log('Imagen eliminada exitosamente');
+      });
+  });
+}
 
 module.exports = {createProveedor, deleteProveedor, updateProveedor};

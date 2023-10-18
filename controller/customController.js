@@ -3,7 +3,6 @@ const fs = require('fs'); //interactua con los archivos del proyecto
 
 
 const createSucursal = async (req, res, next) => {
-  console.log(req.file);
   var data = {
     branch_name: req.body.branch_name,
     branch_direction: req.body.branch_direction,
@@ -11,7 +10,6 @@ const createSucursal = async (req, res, next) => {
     work_personnel: req.body.work_personnel,
     image: req.file.filename,
   };
-  console.log(data);
 
   conexion.query("INSERT INTO branch SET ?", [data], (err, row) => {
     if (err) 
@@ -46,12 +44,15 @@ const updateSucursal = (req, res) => {
     branch_name: req.body.branch_name,
     branch_direction: req.body.branch_direction,
     id_supplier: req.body.id_supplier,
-    work_personnel: req.body.work_personnel,
-    image: req.file.filename,
+    work_personnel: req.body.work_personnel
   };
+  if(req?.file?.filename !== undefined){
+    data={...data, image:req.file.filename }
+  }
     
   console.log(data);
   actualizarImagen(id_branch, data);
+
 
   conexion.query("UPDATE branch SET ? WHERE id_branch = ?", [data, id_branch], (err, row) => {
     if (err) 
@@ -81,19 +82,18 @@ const actualizarImagen = (id_branch, data) => {
     const imagenProyecto = data.image;
     console.log('Imagen Proyecto: ', imagenProyecto);
 
-    if(nombreImagenBD === imagenProyecto)
+    if(imagenProyecto == null)
     {
-      console.log('los nombres de imagen coinciden')
+      console.log('No viene la imagen', imagenProyecto)
+      
     }
     else
     {
-      console.log('los nombres de imagen NO coinciden')
+      console.log('Si viene la imagen')
      
       const rutaImagen = `public/images/${nombreImagenBD}`;
       console.log('ruta: ', rutaImagen);
 
-
-      //fs.unlink(archivo a eliminar, error)
       fs.unlink(rutaImagen, (error) => {
         if (error) 
         {
@@ -101,12 +101,9 @@ const actualizarImagen = (id_branch, data) => {
         }
         console.log('Imagen eliminada exitosamente');
       });
-      
     }
-    
   });
 };
-
 
 const eliminarImagen = (id_branch) => {
   // Consulta para obtener el nombre de la imagen

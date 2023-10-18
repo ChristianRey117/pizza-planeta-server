@@ -7,12 +7,12 @@ const conexion = require("../../database");
 const controller = require("../../controller/productoController");
 
 const storage = multer.diskStorage({
-  destination: "public/images",
-  filename: (req, file, cb) => {
-    cb(
-        null,      file.fieldname + "_"  + file.originalname
-    );
-  },
+    destination: "public/images",
+    filename: (req, file, cb) => {
+      cb(
+        null,      file.fieldname + "_" + Date.now() + path.extname(file.originalname)
+      );
+    },
 });
 
 const uploadImage = multer({
