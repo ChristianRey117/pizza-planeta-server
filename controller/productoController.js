@@ -42,8 +42,11 @@ const updateProducto = (req, res) => {
         product_price: req.body.product_price,
         id_ofert: req.body.id_ofert,
         id_type_category : req.body.id_type_category,
-        image: req.file.filename,
     };
+
+    if(req?.file?.filename !== undefined){
+        data={...data, image:req.file.filename }
+    }
       
     actualizarImagen(id_product, data);
   
@@ -74,21 +77,24 @@ const actualizarImagen = (id_product, data) => {
         const nombreImagenBD = resultado[0].image;
         const imagenProyecto = data.image;
     
-        if(nombreImagenBD === imagenProyecto)
+        if(imagenProyecto == null)
         {
-            console.log('los nombres de imagen coinciden')
+          console.log('No viene la imagen', imagenProyecto)
+          
         }
         else
         {
-            console.log('los nombres de imagen NO coinciden')
+            console.log('Si viene la imagen')
+           
             const rutaImagen = `public/images/${nombreImagenBD}`;
-    
+            console.log('ruta: ', rutaImagen);
+      
             fs.unlink(rutaImagen, (error) => {
-                if (error) 
-                {
-                    console.error('Error al eliminar la imagen:', error);
-                }
-                console.log('Imagen eliminada exitosamente');
+              if (error) 
+              {
+                console.error('Error al eliminar la imagen:', error);
+              }
+              console.log('Imagen eliminada exitosamente');
             });
         }
     });
