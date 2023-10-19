@@ -4,6 +4,7 @@ const app = express();
 const sucursalRoutes = require("./routes/route-sucursales/sucursales-routes");
 const proveedorRoutes = require("./routes/route-proveedores/proveedores-routes");
 const productoRoutes = require("./routes/route-productos/productos-routes");
+const inventarioRoutes = require("./routes/route-inventario/inventario-routes");
 
 
 
@@ -33,4 +34,5 @@ app.get("/", (req, res) => {
 app.use("/sucursales", sucursalRoutes);
 app.use("/proveedores", proveedorRoutes);
 app.use('/productos', productoRoutes);
+app.use('/inventario', inventarioRoutes);
 
