@@ -5,6 +5,7 @@ const sucursalRoutes = require("./routes/route-sucursales/sucursales-routes");
 const proveedorRoutes = require("./routes/route-proveedores/proveedores-routes");
 const productoRoutes = require("./routes/route-productos/productos-routes");
 const inventarioRoutes = require("./routes/route-inventario/inventario-routes");
+const vecindarioRoutes = require("./routes/route-vecindario/vecindario-routes");
 
 
 
@@ -35,4 +36,5 @@ app.use("/sucursales", sucursalRoutes);
 app.use("/proveedores", proveedorRoutes);
 app.use('/productos', productoRoutes);
 app.use('/inventario', inventarioRoutes);
+app.use('/vecindarios', vecindarioRoutes);
 
