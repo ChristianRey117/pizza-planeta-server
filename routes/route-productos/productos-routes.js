@@ -41,8 +41,8 @@ routes.get('/', (req, res) => {
 routes.get('/:id_product', (req, res) => {
     var idProduct = req.params.id_product;
     conexion.query(
-        "SELECT product.id_product, product.product_name, product.product_price, product.image, " +
-        "ofert.name_ofert AS ofert, " +
+        "SELECT product.id_product, product.product_name, product.product_price, product.image, product.id_ofert, " +
+        "ofert.name_ofert AS ofert, product.id_type_category, " +
         "type_category.name_category AS category " +
         "FROM product " +
         "JOIN ofert ON product.id_ofert = ofert.id_ofert " +
