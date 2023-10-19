@@ -1,0 +1,57 @@
+const multer = require("multer");
+const path = require("path");
+
+const express = require("express");
+const routes = express.Router();
+const conexion = require("../../database");
+const controller = require("../../controller/tipocategoriaController");
+
+const storage = multer.diskStorage({
+    destination: "public/images",
+    filename: (req, file, cb) => {
+      cb(
+        null,      file.fieldname + "_" + Date.now() + path.extname(file.originalname)
+      );
+    },
+});
+
+const uploadImage = multer({
+    storage: storage, //configuracion de la carpeta donde se guardaran los archivos subidos por el usuario
+});
+
+
+routes.get('/', (req, res) => {
+    conexion.query(
+        "SELECT type_category.id_category, type_category.name_category, type_category.description " +
+        "FROM type_category ", 
+        (err, rows) => {
+            if(err)
+            {
+                res.send({err:"Error al hacer la consulta"});
+            }
+            res.json(rows);
+        }
+    );
+});
+
+routes.get('/:id_category', (req, res) => {
+    var id = req.params.id_category;
+    conexion.query(
+        "SELECT type_category.id_category, type_category.name_category, type_category.description " +
+        "FROM type_category " +
+        "WHERE type_category.id_category = ?", 
+        [id], (err, rows) => {
+            if(err)
+            {
+                res.send({err:"Error al hacer la consulta"});
+            }
+            res.json(rows);
+        }
+    );
+});
+
+routes.post("/add", uploadImage.none("image"),controller.createTipoCategoria);
+routes.delete("/delete/:id_category",controller.deleteTipoCategoria);
+routes.put("/update/:id_category", uploadImage.none("image"),controller.updateTipoCategoria);
+
+module.exports = routes;
