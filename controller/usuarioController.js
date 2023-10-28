@@ -12,13 +12,22 @@ const createUsuario = async(req, res) => {
         id_branch: req.body.id_branch || null,
         id_neighborhood: req.body.id_neighborhood || null,
     };
-    conexion.query("INSERT INTO user SET ?", [data], (err) => {
-        if (err) 
+
+    conexion.query("SELECT * FROM user WHERE user_email = ?", [data.user_email], (err, row) => {
+        if(row.length > 0)
         {
-           // console.log(err);
-          res.send({ err: "Error al conectar con la base de datos" }); 
+            res.send({err:'Ya existe una cuenta con ese correo'});
         }
-        res.send("Registro exitoso");
+        else
+        {
+            conexion.query("INSERT INTO user SET ?", [data], (err) => {
+                if (err) 
+                {
+                   res.send({ err: "Error al conectar con la base de datos" }); 
+                }
+                    res.send("Registro exitoso");
+            });
+        }
     });
 }
 
