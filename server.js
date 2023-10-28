@@ -8,6 +8,8 @@ const inventarioRoutes = require("./routes/route-inventario/inventario-routes");
 const vecindarioRoutes = require("./routes/route-vecindario/vecindario-routes");
 const tipocategoriaRoutes = require("./routes/route-tipo-categoria/tipo-categoria-routes");
 const ofertaRoutes = require("./routes/route-ofertas/ofertas-routes");
+const tipousuarioRoutes = require("./routes/route-tipo-usuario/tipo-usuario-routes");
+const compraRoutes = require("./routes/route-compra/compra-routes");
 
 
 
@@ -41,4 +43,6 @@ app.use('/inventario', inventarioRoutes);
 app.use('/vecindarios', vecindarioRoutes);
 app.use('/tipocategoria', tipocategoriaRoutes);
 app.use('/ofertas', ofertaRoutes);
+app.use('/tipousuario', tipousuarioRoutes);
+app.use('/compras', compraRoutes);
 
