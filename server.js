@@ -11,6 +11,7 @@ const ofertaRoutes = require("./routes/route-ofertas/ofertas-routes");
 const tipousuarioRoutes = require("./routes/route-tipo-usuario/tipo-usuario-routes");
 const compraRoutes = require("./routes/route-compra/compra-routes");
 const usuarioRoutes = require("./routes/route-usuario/usuario-routes");
+const authRoutes = require("./routes/route-auth/auth-routes");
 
 
 
@@ -44,4 +45,5 @@ app.use('/ofertas', ofertaRoutes);
 app.use('/tipousuario', tipousuarioRoutes);
 app.use('/compras', compraRoutes);
 app.use('/usuario', usuarioRoutes);
+app.use('/', authRoutes);
 
