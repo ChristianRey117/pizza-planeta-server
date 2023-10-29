@@ -1,5 +1,6 @@
 const conexion = require("../database");
 const jwt = require('jsonwebtoken'); //maneja los tokens
+const bcrypt = require('bcryptjs'); //maneja el encriptado
 
 const login = (req, res) => {
   var email = req.body.user_email;
@@ -18,29 +19,40 @@ const login = (req, res) => {
       return res.send({ err: 'CORREO INCORRECTO' });
     }
 
-    ///verfica si las contrasenias coinciden
+    //obtiene el password de la BD
     const passwordBD = row[0].user_password;
 
-    if(data.user_password === passwordBD)
-    {
-      //creacion el TOKEN para front
-      const userData = { id: row[0].id_users,};
-      // Firma el token con una clave secreta y establece la vigencia
-      const claveSecreta = 'pizzaPlaneta';
-      const token = jwt.sign(userData, claveSecreta, { expiresIn: '1h' }); 
-
-      const info = {
-        mensaje: 'LOGIN EXITOSO',
-        token: token,
-        tipo_usuario: row[0].id_type_users,
+    //compara el hash de la BD con la ingresada
+    bcrypt.compare(data.user_password, passwordBD, (error, result) => {
+      if(error)
+      {
+        res.send({error: 'No se pudo comparar el hash'});
       }
 
-      // Envía el token como respuesta
-      res.json({info});
-    }
-    else{
-      res.send({err:'CONTRASEÑA INCORRECTA'});
-    }
+      if(result)
+      {[]
+        //creacion del TOKEN para front
+        const userData = { id: row[0].id_users,};
+        // Firma el token con una clave secreta y establece la vigencia
+        const claveSecreta = 'pizzaPlaneta';
+        const token = jwt.sign(userData, claveSecreta, { expiresIn: '1h' }); 
+
+        const info = {
+          mensaje: 'LOGIN EXITOSO',
+          token: token,
+          id_usuario: row[0].id_users,
+          tipo_usuario: row[0].id_type_users,
+        }
+
+        // Envía el token como respuesta
+        res.json({info});
+      }
+      else
+      {
+        res.send({err:'CONTRASEÑA INCORRECTA'});
+      }
+
+    });
   });
 };
 

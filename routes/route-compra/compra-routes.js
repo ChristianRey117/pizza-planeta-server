@@ -24,7 +24,8 @@ routes.get('/', (req, res) => {
         "SELECT buy.id_buy, buy.ammount, " +
         "DATE_FORMAT(buy.date, '%d-%m-%y %H:%i:%s') AS date, " +
         "user.user_name AS user, " +
-        "product.product_name AS product " +
+        "product.product_name AS product, " +
+        "product.image AS image " +
         "FROM buy " +
         "JOIN user ON buy.id_user = user.id_users " +
         "JOIN product ON buy.id_product = product.id_product ", 
