@@ -6,20 +6,36 @@ const createCompra = async (req, res) => {
    const currentDateTime = moment().tz('America/Mexico_City').format('YYYY-MM-DD HH:mm:ss');  //formato 24
    //const currentDateTime = moment().tz('America/Mexico_City').format('YYYY-MM-DD hh:mm:ss A');  /formato 12
 
+   const products = req.body.products;
+
+
+   products.forEach((element, index) => {
     var data = {
         id_user : req.body.id_user ,
-        id_product : req.body.id_product ,
+        id_product : element.id_product ,
         date: currentDateTime,
-        ammount: req.body.ammount,
+        ammount: element.quantity,
     };
-  
-    conexion.query("INSERT INTO buy SET ?", [data], (err) => {
+
+    conexion.query("INSERT INTO buy SET ?", [data], (err, result) => {
         if (err) 
         {
             res.send({ err: "Error al conectar con la base de datos" });
         }
-        res.send("Registro exitoso");
+        if(products.length -1 === index){
+            var compra = {
+                mensaje:'Registro exitoso',
+                id_buy:result.insertId,
+            };
+            res.send(compra);
+        }
+
     });
+   });
+
+    
+  
+    
 };
 
 
