@@ -48,7 +48,8 @@ routes.get('/usuario/:id_user', (req, res) => {
         "DATE_FORMAT(buy.date, '%d-%m-%y %H:%i:%s') AS date, " +
         "user.user_name AS user, " +
         "product.product_name AS product, " +
-        "product.image AS image " +
+        "product.image AS image, " +
+        "product.product_price AS price " +
         "FROM buy " +
         "JOIN user ON buy.id_user = user.id_users " +
         "JOIN product ON buy.id_product = product.id_product " +
@@ -56,9 +57,21 @@ routes.get('/usuario/:id_user', (req, res) => {
         [id_user], (err, rows) => {
             if(err)
             {
-                res.send({err:'error al obtener las colonias'});
+                res.send({err:'error al obtener la consulta'});
+
             }
-            res.json(rows);
+            var compras = [];
+            var compra = {};
+            rows.forEach(element => {
+                const fecha = element.date;
+                if(!compra[fecha] )
+                {
+                    compra[fecha] = true;
+                    const elementFecha = rows.filter(objeto => objeto.date === fecha);
+                    compras.push(elementFecha);
+                }
+            });
+            res.json(compras);
         }
     );
   });
