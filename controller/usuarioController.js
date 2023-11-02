@@ -43,16 +43,24 @@ const createUsuario = async(req, res) => {
 
 const updateUsuario = (req, res) => {
     var idUser = req.params.id_users;
-    var data = {
-        user_name: req.body.user_name,
-        phone: req.body.phone,
-        user_email: req.body.user_email,
-        direction: req.body.direction,
-        id_type_users: req.body.id_type_users || null,
-        id_branch: req.body.id_branch || null,
-        id_neighborhood: req.body.id_neighborhood || null,
-    };
-    
+    if(req.body.user_name !== undefined){
+        var data = {
+            user_name: req.body.user_name,
+            phone: req.body.phone,
+            user_email: req.body.user_email,
+            direction: req.body.direction,
+            id_type_users: req.body.id_type_users || 1,
+            id_branch: req.body.id_branch || null,
+            id_neighborhood: req.body.id_neighborhood || null,
+        };
+        
+    }else{
+        var data = {
+            id_type_users: req.body.id_type_users
+        }
+    }
+
+   
 
     //verifica si entra una contrasenia nueva
     if(req?.body?.user_password !== undefined)
