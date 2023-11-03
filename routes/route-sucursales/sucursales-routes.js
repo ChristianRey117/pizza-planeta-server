@@ -6,7 +6,7 @@ const routes = express.Router();
 const conexion = require("../../database");
 
 const storage = multer.diskStorage({
-  destination: "public/images",
+  destination: "../../public/images",
   filename: (req, file, cb) => {
     cb(
       null,      file.fieldname + "_" + Date.now() + path.extname(file.originalname)
