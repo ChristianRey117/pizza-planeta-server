@@ -2,10 +2,10 @@ const mysql = require("mysql");
 
 // Configuración de la conexión a la base de datos
 const conexion = mysql.createConnection({
-  host: "localhost",
+  host: "database-laravel.mysql.database.azure.com",
   database: "pizza_planeta",
-  user: "root",
-  password: "",
+  user: "christian",
+  password: "GATOvaca1",
 });
 
 // Conectar a la base de datos
