@@ -49,7 +49,8 @@ routes.get('/usuario/:id_user', (req, res) => {
         "user.user_name AS user, " +
         "product.product_name AS product, " +
         "product.image AS image, " +
-        "product.product_price AS price " +
+        "product.product_price AS price, " +
+        "buy.total_buy " +
         "FROM buy " +
         "JOIN user ON buy.id_user = user.id_users " +
         "JOIN product ON buy.id_product = product.id_product " +
@@ -71,11 +72,41 @@ routes.get('/usuario/:id_user', (req, res) => {
                     compras.push(elementFecha);
                 }
             });
-            res.json(compras);
+
+
+            var orderCompra = convertirCadenasAFechas(compras);
+            orderCompra.sort((a,b)=> b[0].date - a[0].date);
+
+            orderCompra = orderCompra.map(function (subArray) {
+                return subArray.map(function (obj) {
+                  obj.date = obj.date.toLocaleString();
+                  return obj;
+                });
+              });
+            res.json(orderCompra);
         }
     );
   });
 //compras segun el Usuario
+
+function convertirCadenasAFechas(array) {
+    return array.map(function (subArray) {
+      return subArray.map(function (obj) {
+        const parts = obj.date.split(" ");
+        const dateParts = parts[0].split("-");
+        const timeParts = parts[1].split(":");
+        const year = `20${dateParts[2]}`;
+        const month = dateParts[1] - 1; // Restar 1 porque los meses en Date son de 0 a 11
+        const day = dateParts[0];
+        const hours = timeParts[0];
+        const minutes = timeParts[1];
+        const seconds = timeParts[2];
+  
+        obj.date = new Date(year, month, day, hours, minutes, seconds);
+        return obj;
+      });
+    });
+}
   
 
 routes.post("/add", uploadImage.none("image"), controller.createCompra);
