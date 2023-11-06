@@ -22,9 +22,8 @@ const controller = require("../../controller/customController");
 
 routes.get("/", (req, res) => {
   conexion.query(
-    "SELECT branch.id_branch, branch.branch_name, branch.branch_direction, branch.work_personnel, branch.image, supplier.supplier_name AS supplier" +
-      " FROM branch" +
-      " JOIN supplier ON branch.id_supplier = supplier.id_supplier",
+    "SELECT branch.id_branch, branch.branch_name, branch.branch_direction, branch.work_personnel, branch.image " +
+      "FROM branch" ,
     (err, rows) => {
       if (err) {
         res.send({ err: "Error al conectar con la base de datos" });
@@ -37,10 +36,9 @@ routes.get("/", (req, res) => {
 routes.get("/:id_branch", (req, res) =>{
   var id = req.params.id_branch;
   conexion.query(
-    "SELECT branch.id_branch, branch.branch_name, branch.branch_direction, branch.work_personnel, branch.image, branch.id_supplier, supplier.supplier_name AS supplier" +
-    " FROM branch" +
-    " JOIN supplier ON branch.id_supplier = supplier.id_supplier" +
-    " WHERE branch.id_branch = ?", 
+    "SELECT branch.id_branch, branch.branch_name, branch.branch_direction, branch.work_personnel, branch.image " +
+    "FROM branch " +
+    "WHERE branch.id_branch = ?", 
     [id], (err, rows) => {
       if(err) {
         res.send({err: "No se encontro el registro"});

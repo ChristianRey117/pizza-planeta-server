@@ -1,3 +1,4 @@
+const { error } = require("console");
 const conexion = require("../database");
 const fs = require('fs'); //interactua con los archivos del proyecto
 
@@ -6,17 +7,42 @@ const createSucursal = async (req, res, next) => {
   var data = {
     branch_name: req.body.branch_name,
     branch_direction: req.body.branch_direction,
-    id_supplier: req.body.id_supplier,
     work_personnel: req.body.work_personnel,
     image: req.file.filename,
   };
 
-  conexion.query("INSERT INTO branch SET ?", [data], (err, row) => {
+  conexion.query("INSERT INTO branch SET ?", [data], (err, result) => {
     if (err) 
     {
       res.send({ err: "Error al conectar con la base de datos" });
     }
-    res.send("Registro exitoso");
+     const idBranch = result.insertId;
+      const suppliers = JSON.parse(req.body.ids_supliers);
+      console.log(suppliers);
+
+
+      suppliers.forEach(element => {
+
+        var data2 = {
+          id_branch : idBranch,
+          id_supplier : element,
+        };
+
+        console.log(data2);
+
+        conexion.query("INSERT INTO supplier_branch SET ?", [data2], (err2) => {
+          if(err2)
+          {
+            res.send({err2:"Error al insertar proveedores en supplier_branch"});
+          }
+          else
+          {
+            res.send("Registro exitoso");
+            
+          }
+        });
+
+      });
   });
 };
 
@@ -43,7 +69,7 @@ const updateSucursal = (req, res) => {
   var data = {
     branch_name: req.body.branch_name,
     branch_direction: req.body.branch_direction,
-    id_supplier: req.body.id_supplier,
+    //id_supplier: req.body.id_supplier,
     work_personnel: req.body.work_personnel
   };
   if(req?.file?.filename !== undefined){
@@ -59,7 +85,9 @@ const updateSucursal = (req, res) => {
     {
       res.send({ err: "Error al conectar con la base de datos" });
     }
+    
     res.send("Actualizacion exitosa");
+    
   });
 }
 
