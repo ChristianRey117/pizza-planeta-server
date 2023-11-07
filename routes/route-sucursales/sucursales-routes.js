@@ -54,4 +54,5 @@ routes.delete("/delete/:id_branch", controller.deleteSucursal);
 
 routes.put("/update/:id_branch", uploadImage.single("image"), controller.updateSucursal);
 
+
 module.exports = routes;

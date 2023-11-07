@@ -16,47 +16,54 @@ const createSucursal = async (req, res, next) => {
     {
       res.send({ err: "Error al conectar con la base de datos" });
     }
-     const idBranch = result.insertId;
-      const suppliers = JSON.parse(req.body.ids_supliers);
-      console.log(suppliers);
 
-
-      suppliers.forEach(element => {
-
-        var data2 = {
-          id_branch : idBranch,
-          id_supplier : element,
-        };
-
-        console.log(data2);
-
-        conexion.query("INSERT INTO supplier_branch SET ?", [data2], (err2) => {
-          if(err2)
-          {
-            res.send({err2:"Error al insertar proveedores en supplier_branch"});
-          }
-          else
-          {
-            res.send("Registro exitoso");
-            
-          }
-        });
-
+    const suppliers = JSON.parse(req.body.ids_supliers);
+    let ocurrioError = false; //bandera de error
+    console.log('proveedores: ', suppliers);
+  
+    suppliers.forEach(element => {
+  
+      var proveedores = {
+        id_branch : result.insertId,
+        id_supplier : element,
+      };
+  
+      console.log(proveedores);
+  
+      conexion.query("INSERT INTO supplier_branch SET ?", [proveedores], (err2) => {
+        if(err2)
+        {
+          ocurrioError = true; // si se produce el error entonces avisa al if de abajo;
+        }
       });
+    });
+  
+    if (ocurrioError) 
+    {
+      res.send({ error: "Error al insertar proveedores en supplier_branch" });
+    } 
+    else 
+    {
+      res.send("Registro exitoso de proveedores y de la sucursal");
+      console.log("Registro exitoso de proveedores y de la sucursal");
+    }
+
   });
 };
 
 
 const deleteSucursal = async (req, res) => {
   var id_branch = req.params.id_branch;
+  eliminarProveedores(id_branch);
   eliminarImagen(id_branch); //se envia el id
 
-  //Eliminacion de registro en base de datos
-  conexion.query("DELETE FROM branch WHERE id_branch = ?", [id_branch], (err, rows) => {
+  conexion.query("DELETE FROM branch WHERE id_branch = ?", [id_branch], (err) => {
     if (err) {
       res.send({err:'Error al eliminar el registro:'},);
+      console.log('Error al eliminar la sucursal');
     } else {
       res.send('Registro eliminado exitosamente');
+      console.log('Registro eliminado exitosamente');
     }
   });
 };
@@ -69,7 +76,6 @@ const updateSucursal = (req, res) => {
   var data = {
     branch_name: req.body.branch_name,
     branch_direction: req.body.branch_direction,
-    //id_supplier: req.body.id_supplier,
     work_personnel: req.body.work_personnel
   };
   if(req?.file?.filename !== undefined){
@@ -91,7 +97,24 @@ const updateSucursal = (req, res) => {
   });
 }
 
+/**PROVEEDORES */
+const eliminarProveedores = (IDbranch) =>
+{
+  conexion.query("DELETE FROM supplier_branch WHERE id_branch = ?", [IDbranch], (err) => {
+    if(err)
+    {
+      console.log('Error al eliminar los proveedores');
+    }
+    else
+    {
+      console.log('Proveedores eliminados exitosamente');
+    }
+  });
+}
 
+
+
+/**IMAGENES */
 const actualizarImagen = (id_branch, data) => {
   // Consulta para obtener el nombre de la imagen
   conexion.query("SELECT image FROM branch WHERE id_branch = ?", [id_branch], (err, resultado) => {
@@ -165,7 +188,4 @@ const eliminarImagen = (id_branch) => {
 };
 
 
-
-
-
-module.exports = { createSucursal, deleteSucursal, updateSucursal };
+module.exports = { createSucursal, deleteSucursal, updateSucursal};
