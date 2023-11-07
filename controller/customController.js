@@ -19,36 +19,10 @@ const createSucursal = async (req, res, next) => {
 
     const suppliers = JSON.parse(req.body.ids_supliers);
     var ID = result.insertId;
-    let ocurrioError = false; //bandera de error
-    console.log('proveedores: ', suppliers, "id " , ID);
-  
-    suppliers.forEach(element => {
-  
-      var proveedores = {
-        id_branch : ID,
-        id_supplier : element,
-      };
-  
-      console.log(proveedores);
-  
-      conexion.query("INSERT INTO supplier_branch SET ?", [proveedores], (err2) => {
-        if(err2)
-        {
-          ocurrioError = true; // si se produce el error entonces avisa al if de abajo;
-        }
-      });
-    });
-  
-    if (ocurrioError) 
-    {
-      res.send({ error: "Error al insertar proveedores en supplier_branch" });
-    } 
-    else 
-    {
-      res.send("Registro exitoso de proveedores y de la sucursal");
-      console.log("Registro exitoso de proveedores y de la sucursal");
-    }
+    console.log('proveedores: ', suppliers, "id: " , ID);
 
+    insertarProveedores(suppliers, ID);
+    res.send('Registro exitoso');
   });
 };
 
@@ -86,19 +60,65 @@ const updateSucursal = (req, res) => {
   console.log(data);
   actualizarImagen(id_branch, data);
 
-
+  if(req.body.ids_supliers) 
+  {
+    const suppliers = JSON.parse(req.body.ids_supliers);
+    console.log('nuevos proveedores: ', suppliers, "id: " , id_branch);
+    actualizarProveedores(suppliers, id_branch);
+  } 
+  
   conexion.query("UPDATE branch SET ? WHERE id_branch = ?", [data, id_branch], (err, row) => {
     if (err) 
     {
       res.send({ err: "Error al conectar con la base de datos" });
     }
-    
     res.send("Actualizacion exitosa");
-    
   });
-}
+};
+
+
 
 /**PROVEEDORES */
+
+const insertarProveedores = (suppliers, ID) =>
+{
+  let ocurrioError = false; //bandera de error
+
+  suppliers.forEach(element => {
+  
+    var proveedores = {
+      id_branch : ID,
+      id_supplier : element,
+    };
+
+    console.log('fila: ', proveedores);
+    
+    conexion.query("INSERT INTO supplier_branch SET ?", [proveedores], (err2) => {
+      if(err2)
+      {
+        ocurrioError = true; // si se produce el error entonces avisa al if de abajo;
+      }
+    });
+  });
+
+  if (ocurrioError) 
+  {
+    console.log("Error al insertar proveedores en supplier_branch");
+  } 
+  else 
+  {
+    console.log("Registro exitoso de proveedores y de la sucursal");
+  }
+}
+
+const actualizarProveedores = (suppliers, id_branch) => {
+  
+  eliminarProveedores(id_branch);
+  insertarProveedores(suppliers, id_branch);
+
+}
+
+
 const eliminarProveedores = (IDbranch) =>
 {
   conexion.query("DELETE FROM supplier_branch WHERE id_branch = ?", [IDbranch], (err) => {
@@ -112,7 +132,6 @@ const eliminarProveedores = (IDbranch) =>
     }
   });
 }
-
 
 
 /**IMAGENES */
