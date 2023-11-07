@@ -32,8 +32,7 @@ routes.get("/", (req, res) => {
     "GROUP BY branch.id_branch ",
     (err, rows) => {
       if (err) {
-        //res.send({ err: "Error al conectar con la base de datos" });
-        console.log(err);
+        res.send({ err: "Error al conectar con la base de datos" });
       }
       res.json(rows);
     }
@@ -73,8 +72,7 @@ routes.get("/:id_branch", (req, res) =>{
     "GROUP BY branch.id_branch ", 
     [id], (err, rows) => {
       if(err) {
-        console.log(err);
-        //res.send({err: "No se encontro el registro"});
+        res.send({err: "No se encontro el registro"});
       }
       res.json(rows);      
     }
