@@ -18,13 +18,14 @@ const createSucursal = async (req, res, next) => {
     }
 
     const suppliers = JSON.parse(req.body.ids_supliers);
+    var ID = result.insertId;
     let ocurrioError = false; //bandera de error
-    console.log('proveedores: ', suppliers);
+    console.log('proveedores: ', suppliers, "id " , ID);
   
     suppliers.forEach(element => {
   
       var proveedores = {
-        id_branch : result.insertId,
+        id_branch : ID,
         id_supplier : element,
       };
   
