@@ -1,3 +1,4 @@
+const { error } = require("console");
 const conexion = require("../database");
 const fs = require('fs'); //interactua con los archivos del proyecto
 
@@ -6,31 +7,38 @@ const createSucursal = async (req, res, next) => {
   var data = {
     branch_name: req.body.branch_name,
     branch_direction: req.body.branch_direction,
-    id_supplier: req.body.id_supplier,
     work_personnel: req.body.work_personnel,
     image: req.file.filename,
   };
 
-  conexion.query("INSERT INTO branch SET ?", [data], (err, row) => {
+  conexion.query("INSERT INTO branch SET ?", [data], (err, result) => {
     if (err) 
     {
       res.send({ err: "Error al conectar con la base de datos" });
     }
-    res.send("Registro exitoso");
+
+    const suppliers = JSON.parse(req.body.ids_supliers);
+    var ID = result.insertId;
+    console.log('proveedores: ', suppliers, "id: " , ID);
+
+    insertarProveedores(suppliers, ID);
+    res.send('Registro exitoso');
   });
 };
 
 
 const deleteSucursal = async (req, res) => {
   var id_branch = req.params.id_branch;
+  eliminarProveedores(id_branch);
   eliminarImagen(id_branch); //se envia el id
 
-  //Eliminacion de registro en base de datos
-  conexion.query("DELETE FROM branch WHERE id_branch = ?", [id_branch], (err, rows) => {
+  conexion.query("DELETE FROM branch WHERE id_branch = ?", [id_branch], (err) => {
     if (err) {
       res.send({err:'Error al eliminar el registro:'},);
+      console.log('Error al eliminar la sucursal');
     } else {
       res.send('Registro eliminado exitosamente');
+      console.log('Registro eliminado exitosamente');
     }
   });
 };
@@ -43,7 +51,6 @@ const updateSucursal = (req, res) => {
   var data = {
     branch_name: req.body.branch_name,
     branch_direction: req.body.branch_direction,
-    id_supplier: req.body.id_supplier,
     work_personnel: req.body.work_personnel
   };
   if(req?.file?.filename !== undefined){
@@ -53,7 +60,13 @@ const updateSucursal = (req, res) => {
   console.log(data);
   actualizarImagen(id_branch, data);
 
-
+  if(req.body.ids_supliers) 
+  {
+    const suppliers = JSON.parse(req.body.ids_supliers);
+    console.log('nuevos proveedores: ', suppliers, "id: " , id_branch);
+    actualizarProveedores(suppliers, id_branch);
+  } 
+  
   conexion.query("UPDATE branch SET ? WHERE id_branch = ?", [data, id_branch], (err, row) => {
     if (err) 
     {
@@ -61,9 +74,67 @@ const updateSucursal = (req, res) => {
     }
     res.send("Actualizacion exitosa");
   });
+};
+
+
+
+/**PROVEEDORES */
+
+const insertarProveedores = (suppliers, ID) =>
+{
+  let ocurrioError = false; //bandera de error
+
+  suppliers.forEach(element => {
+  
+    var proveedores = {
+      id_branch : ID,
+      id_supplier : element,
+    };
+
+    console.log('fila: ', proveedores);
+    
+    conexion.query("INSERT INTO supplier_branch SET ?", [proveedores], (err2) => {
+      if(err2)
+      {
+        ocurrioError = true; // si se produce el error entonces avisa al if de abajo;
+      }
+    });
+  });
+
+  if (ocurrioError) 
+  {
+    console.log("Error al insertar proveedores en supplier_branch");
+  } 
+  else 
+  {
+    console.log("Registro exitoso de proveedores y de la sucursal");
+  }
+}
+
+const actualizarProveedores = (suppliers, id_branch) => {
+  
+  eliminarProveedores(id_branch);
+  insertarProveedores(suppliers, id_branch);
+
 }
 
 
+const eliminarProveedores = (IDbranch) =>
+{
+  conexion.query("DELETE FROM supplier_branch WHERE id_branch = ?", [IDbranch], (err) => {
+    if(err)
+    {
+      console.log('Error al eliminar los proveedores');
+    }
+    else
+    {
+      console.log('Proveedores eliminados exitosamente');
+    }
+  });
+}
+
+
+/**IMAGENES */
 const actualizarImagen = (id_branch, data) => {
   // Consulta para obtener el nombre de la imagen
   conexion.query("SELECT image FROM branch WHERE id_branch = ?", [id_branch], (err, resultado) => {
@@ -137,7 +208,4 @@ const eliminarImagen = (id_branch) => {
 };
 
 
-
-
-
-module.exports = { createSucursal, deleteSucursal, updateSucursal };
+module.exports = { createSucursal, deleteSucursal, updateSucursal};
