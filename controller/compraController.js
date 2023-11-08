@@ -7,6 +7,7 @@ const createCompra = async (req, res) => {
    //const currentDateTime = moment().tz('America/Mexico_City').format('YYYY-MM-DD hh:mm:ss A');  /formato 12
 
    const products = req.body.products;
+   console.log(req.body);
 
 
    products.forEach((element, index) => {
@@ -14,8 +15,9 @@ const createCompra = async (req, res) => {
         id_user : req.body.id_user ,
         id_product : element.id_product ,
         date: currentDateTime,
-        ammount: element.quantity,
+        ammount: element.quantity
     };
+    data = {...data, total_buy: element.product_price };
 
     conexion.query("INSERT INTO buy SET ?", [data], (err, result) => {
         if (err) 
