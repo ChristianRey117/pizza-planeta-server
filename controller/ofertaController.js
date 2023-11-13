@@ -4,12 +4,8 @@ const fs = require('fs'); //interactua con los archivos del proyecto
 const config = require('dotenv');
 config.config();
 const path = require("path");
+const _blobService = require("../blobservices")
 
-
-const _blobService = require('@azure/storage-blob');
-
-const blobService = _blobService.BlobServiceClient.fromConnectionString("DefaultEndpointsProtocol=https;AccountName=cs710032000dda411cc;AccountKey=oEfje6qvbAHRKBZIg5r9r7NtyUW4DIaCWgOn5tMCnW7BHhKjX5aBSa5PzHQDSeFAZhp+D3FADf4D+ASt0ToVVA==;EndpointSuffix=core.windows.net")
-const containerClient = blobService.getContainerClient("pizza-planeta");
 
 const log = require("../log");
 
@@ -22,7 +18,7 @@ const createOferta = async (req, res) => {
     log.logger.info("Blob name ---->" , blobName);
     log.logger.info("Buffer ---->" , buffer);
 
-    await containerClient.getBlockBlobClient(blobName).uploadData(buffer);
+    await _blobService.updloadImage(blobName,buffer);
 
     var data = {
         name_ofert: req.body.name_ofert,
@@ -110,10 +106,8 @@ const actualizarImagen = (id_ofert, data, buffer) => {
         }
         else
         {
-            
-            const response = await containerClient.getBlockBlobClient(nombreImagenBD).deleteIfExists();
-            console.log(response);
-            await containerClient.getBlockBlobClient(imagenProyecto).uploadData(buffer);
+            await _blobService.deleteImage(nombreImagenBD);
+            await _blobService.updloadImage(imagenProyecto,buffer);
 
         }
     });
@@ -133,8 +127,7 @@ const eliminarImagen = async (id_ofert) => {
         }
     
         const nombreImagen = resultado[0].image;
-        const response = await containerClient.getBlockBlobClient(nombreImagen).deleteIfExists();
-        console.log(response);
+        await _blobService.deleteImage(nombreImagen);
     });
 };
 
