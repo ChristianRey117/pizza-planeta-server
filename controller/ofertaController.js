@@ -9,16 +9,18 @@ const _blobService = require('@azure/storage-blob');
 const blobService = _blobService.BlobServiceClient.fromConnectionString("DefaultEndpointsProtocol=https;AccountName=cs710032000dda411cc;AccountKey=oEfje6qvbAHRKBZIg5r9r7NtyUW4DIaCWgOn5tMCnW7BHhKjX5aBSa5PzHQDSeFAZhp+D3FADf4D+ASt0ToVVA==;EndpointSuffix=core.windows.net")
 const containerClient = blobService.getContainerClient("pizza-planeta");
 
+const log = require("../log");
+
 
 const createOferta = async (req, res) => {
 
     const blobName = req.file.originalname;
     const {buffer} = req.file;
 
-    console.log("Blob name ---->" , blobName);
-    console.log("Buffer ---->" , buffer);
+    log.logger.info("Blob name ---->" , blobName);
+    log.logger.info("Buffer ---->" , buffer);
 
-    await containerClient.getBlockBlobClient(blobName).uploadData(buffer)
+    await containerClient.getBlockBlobClient(blobName).uploadData(buffer);
 
     var data = {
         name_ofert: req.body.name_ofert,
@@ -26,6 +28,8 @@ const createOferta = async (req, res) => {
         description: req.body.description,
         image: blobName,
     };
+
+    log.logger.info("data ---->" , data);
     conexion.query("INSERT INTO ofert SET ?", [data], (err) => {
         if (err) 
         {
