@@ -3,6 +3,8 @@ const conexion = require("../database");
 const fs = require('fs'); //interactua con los archivos del proyecto
 const config = require('dotenv');
 config.config();
+const path = require("path");
+
 
 const _blobService = require('@azure/storage-blob');
 
@@ -14,7 +16,7 @@ const log = require("../log");
 
 const createOferta = async (req, res) => {
 
-    const blobName = req.file.originalname;
+    const blobName = req.file?.fieldname + "_" + Date.now() + path.extname(req.file.originalname);
     const {buffer} = req.file;
 
     log.logger.info("Blob name ---->" , blobName);
@@ -67,7 +69,9 @@ const updateOferta = (req, res) => {
     };
 
     if(req?.file?.originalname !== undefined){
-        data={...data, image:req.file.originalname }
+        const blobName = req.file?.fieldname + "_" + Date.now() + path.extname(req.file.originalname);
+
+        data={...data, image:blobName }
     }
       
     actualizarImagen(id_ofert, data, buffer);
