@@ -15,7 +15,7 @@ const usuarioRoutes = require("./routes/route-usuario/usuario-routes");
 const authRoutes = require("./routes/route-auth/auth-routes");
 
 // Add the 'cors' middleware
-app.use(cors({ origin: "http://localhost:3000" }));
+app.use(cors({ origin: "https://pizza-planeta.netlify.app" }));
 
 app.use(express.json());
 app.use(express.static("public"));
