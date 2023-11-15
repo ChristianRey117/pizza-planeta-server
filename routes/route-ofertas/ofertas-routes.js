@@ -1,18 +1,10 @@
 const multer = require("multer");
-const path = require("path");
 
 const express = require("express");
 const routes = express.Router();
 const conexion = require("../../database");
 const controller = require("../../controller/ofertaController");
 
-const storage = multer.diskStorage({
-    filename: (req, file, cb) => {
-      cb(
-        null,      file.fieldname + "_" + Date.now() + path.extname(file.originalname)
-      );
-    },
-});
 
 const uploadImage = multer({
     storage: multer.memoryStorage(), //configuracion de la carpeta donde se guardaran los archivos subidos por el usuario

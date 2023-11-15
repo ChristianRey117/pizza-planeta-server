@@ -4,7 +4,7 @@ const fs = require('fs'); //interactua con los archivos del proyecto
 const config = require('dotenv');
 config.config();
 const path = require("path");
-const _blobService = require("../blobservices")
+const _blobService = require("../blobservices");
 
 
 const log = require("../log");

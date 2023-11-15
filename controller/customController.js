@@ -1,16 +1,22 @@
 const { error } = require("console");
 const conexion = require("../database");
-const fs = require('fs'); //interactua con los archivos del proyecto
+const path = require("path");
+const _blobService = require("../blobservices");
 
 
 const createSucursal = async (req, res, next) => {
+
+  const blobName = req.file?.fieldname + "_" + Date.now() + path.extname(req.file.originalname);
+  const {buffer} = req.file;
+
   var data = {
     branch_name: req.body.branch_name,
     branch_direction: req.body.branch_direction,
     work_personnel: req.body.work_personnel,
-    image: req.file.filename,
+    image: blobName,
   };
 
+  await _blobService.updloadImage(blobName,buffer);
   conexion.query("INSERT INTO branch SET ?", [data], (err, result) => {
     if (err) 
     {
@@ -46,19 +52,21 @@ const deleteSucursal = async (req, res) => {
 
 const updateSucursal = (req, res) => {
   var id_branch = req.params.id_branch;
-  console.log(id_branch);
-  //console.log(req.body);
+  const {buffer} = req.file;
+
   var data = {
     branch_name: req.body.branch_name,
     branch_direction: req.body.branch_direction,
     work_personnel: req.body.work_personnel
   };
-  if(req?.file?.filename !== undefined){
-    data={...data, image:req.file.filename }
+  if(req?.file?.originalname !== undefined){
+    const blobName = req.file?.fieldname + "_" + Date.now() + path.extname(req.file.originalname);
+    data={...data, image:blobName }
   }
     
-  console.log(data);
-  actualizarImagen(id_branch, data);
+  console.log('Buffer->',buffer);
+  console.log('Data->',data);
+  actualizarImagen(id_branch, data, buffer);
 
   if(req.body.ids_supliers) 
   {
@@ -135,9 +143,9 @@ const eliminarProveedores = (IDbranch) =>
 
 
 /**IMAGENES */
-const actualizarImagen = (id_branch, data) => {
+const actualizarImagen = (id_branch, data, buffer) => {
   // Consulta para obtener el nombre de la imagen
-  conexion.query("SELECT image FROM branch WHERE id_branch = ?", [id_branch], (err, resultado) => {
+  conexion.query("SELECT image FROM branch WHERE id_branch = ?", [id_branch], async(err, resultado) => {
     if (err) 
     {
       console.error('Error al obtener el nombre de la imagen:', err);
@@ -149,9 +157,7 @@ const actualizarImagen = (id_branch, data) => {
     }
 
     const nombreImagenBD = resultado[0].image;
-    console.log('Imagen BD: ', nombreImagenBD);
     const imagenProyecto = data.image;
-    console.log('Imagen Proyecto: ', imagenProyecto);
 
     if(imagenProyecto == null)
     {
@@ -160,25 +166,17 @@ const actualizarImagen = (id_branch, data) => {
     }
     else
     {
-      console.log('Si viene la imagen')
-     
-      const rutaImagen = `public/images/${nombreImagenBD}`;
-      console.log('ruta: ', rutaImagen);
+      console.log('Si viene la imagen-->', buffer)
+      await _blobService.deleteImage(nombreImagenBD);
+      await _blobService.updloadImage(imagenProyecto, buffer);
 
-      fs.unlink(rutaImagen, (error) => {
-        if (error) 
-        {
-          console.error('Error al eliminar la imagen:', error);
-        }
-        console.log('Imagen eliminada exitosamente');
-      });
     }
   });
 };
 
 const eliminarImagen = (id_branch) => {
   // Consulta para obtener el nombre de la imagen
-  conexion.query("SELECT image FROM branch WHERE id_branch = ?", [id_branch], (err, resultado) => {
+  conexion.query("SELECT image FROM branch WHERE id_branch = ?", [id_branch], async(err, resultado) => {
     if (err) 
     {
       console.error('Error al obtener el nombre de la imagen:', err);
@@ -187,23 +185,14 @@ const eliminarImagen = (id_branch) => {
     if (resultado.length === 0) 
     {
       console.error('Imagen no encontrada');
+    }else{
+
+      const nombreImagen = resultado[0].image;
+      await _blobService.deleteImage(nombreImagen);
     }
 
-    const nombreImagen = resultado[0].image;
-    console.log('nombre de la Imagen: ', nombreImagen);
+   
 
-    // Elimina la imagen del proyecto
-    const rutaImagen = `public/images/${nombreImagen}`;
-    console.log('ruta: ', rutaImagen);
-
-    //fs.unlink(archivo a eliminar, error)
-    fs.unlink(rutaImagen, (error) => {
-      if (error) 
-      {
-        console.error('Error al eliminar la imagen:', error);
-      }
-      console.log('Imagen eliminada exitosamente');
-    });
   });
 };
 

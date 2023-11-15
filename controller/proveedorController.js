@@ -1,12 +1,19 @@
 const conexion = require("../database");
-const fs = require('fs'); //interactua con los archivos del proyecto
+const path = require("path");
+
+const _blobService = require("../blobservices");
+
 
 const createProveedor = async(req, res) => {
+    const blobName = req.file.fieldname + "_" + Date.now() + path.extname(req.file.originalname);
+    const {buffer} = req.file;
     var data = {
         supplier_name: req.body.supplier_name,
         supplier_product: req.body.supplier_product,
-        image: req.file.filename,
+        image: blobName
     };
+
+    await _blobService.updloadImage(blobName,buffer);
     conexion.query("INSERT INTO supplier SET ?", [data], (err) => {
         if (err) 
         {
@@ -30,16 +37,19 @@ const deleteProveedor = async (req, res) => {
 
 const updateProveedor = (req, res) => {
     var id_supplier = req.params.id_supplier;
+    const {buffer} = req.file;
+    console.log("Buffer ---->" , buffer);
+
     var data = {
           supplier_name: req.body.supplier_name,
           supplier_product: req.body.supplier_product,
       };
     
-    if(req?.file?.filename !== undefined){
-      data={...data, image:req.file.filename }
+    if(req?.file?.originalname !== undefined){
+      data={...data, image:req.file.fieldname + "_" + Date.now() + path.extname(req.file.originalname) }
     }
     
-  actualizarImagen(id_supplier, data);
+  actualizarImagen(id_supplier, data, buffer);
 
   conexion.query("UPDATE supplier SET ? WHERE id_supplier = ?", [data, id_supplier], (err) => {
     if (err) 
@@ -52,8 +62,8 @@ const updateProveedor = (req, res) => {
 
 
 
-const actualizarImagen = (id_supplier, data) => {
-  conexion.query("SELECT image FROM supplier WHERE id_supplier = ?", [id_supplier], (err, resultado) => {
+const actualizarImagen = (id_supplier, data, buffer) => {
+  conexion.query("SELECT image FROM supplier WHERE id_supplier = ?", [id_supplier], async(err, resultado) => {
     if (err) 
     {
       console.error('Error al obtener el nombre de la imagen:', err);
@@ -71,25 +81,15 @@ const actualizarImagen = (id_supplier, data) => {
     }
     else
    {
-      console.log('Si viene la imagen')
-              
-      const rutaImagen = `public/images/${nombreImagenBD}`;
-      console.log('ruta: ', rutaImagen);
-          
-      fs.unlink(rutaImagen, (error) => {
-        if (error) 
-        {
-          console.error('Error al eliminar la imagen:', error);
-        }
-        console.log('Imagen eliminada exitosamente');
-      });
+      await _blobService.deleteImage(nombreImagenBD);
+      await _blobService.updloadImage(imagenProyecto, buffer);
     }
   });
 };
 
 
 const eliminarImagen = (id_supplier) => {
-  conexion.query("SELECT image FROM supplier WHERE id_supplier = ?", [id_supplier], (err, resultado) => {
+  conexion.query("SELECT image FROM supplier WHERE id_supplier = ?", [id_supplier], async(err, resultado) => {
       if (err) 
       {
         console.error('Error al obtener el nombre de la imagen:', err);
@@ -100,15 +100,7 @@ const eliminarImagen = (id_supplier) => {
       }
 
       const nombreImagen = resultado[0].image;
-      const rutaImagen = `public/images/${nombreImagen}`;
-
-      fs.unlink(rutaImagen, (error) => {
-        if (error) 
-        {
-          console.error('Error al eliminar la imagen:', error);
-        }
-        console.log('Imagen eliminada exitosamente');
-      });
+      await _blobService.deleteImage(nombreImagen);
   });
 }
 

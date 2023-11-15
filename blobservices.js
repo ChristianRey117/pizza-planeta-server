@@ -6,6 +6,7 @@ const containerClient = blobService.getContainerClient("pizza-planeta");
 
 const updloadImage = async (blobName, buffer)=>{
     await containerClient.getBlockBlobClient(blobName).uploadData(buffer);
+    console.log('imagen subida--->', blobName);
 }
 
 const deleteImage = async (blobName) =>{

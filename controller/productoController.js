@@ -2,12 +2,7 @@ const conexion = require("../database");
 const config = require('dotenv');
 config.config();
 const path = require("path");
-
-
-const _blobService = require('@azure/storage-blob');
-
-const blobService = _blobService.BlobServiceClient.fromConnectionString("DefaultEndpointsProtocol=https;AccountName=cs710032000dda411cc;AccountKey=oEfje6qvbAHRKBZIg5r9r7NtyUW4DIaCWgOn5tMCnW7BHhKjX5aBSa5PzHQDSeFAZhp+D3FADf4D+ASt0ToVVA==;EndpointSuffix=core.windows.net")
-const containerClient = blobService.getContainerClient("pizza-planeta");
+const _blobService = require("../blobservices");
 
 const log = require("../log");
 
@@ -18,7 +13,7 @@ const createProducto = async (req, res) => {
     log.logger.info("Blob name ---->" , blobName);
     log.logger.info("Buffer ---->" , buffer);
 
-    await containerClient.getBlockBlobClient(blobName).uploadData(buffer);
+    await _blobService.updloadImage(blobName,buffer);
     var data = {
         product_name: req.body.product_name,
         product_price: req.body.product_price,
@@ -61,12 +56,11 @@ const updateProducto = (req, res) => {
         id_type_category : req.body.id_type_category,
     };
 
-    if(req?.file?.filename !== undefined){
-        // data={...data, image:req.file.filename }
+    if(req?.file?.originalname !== undefined){
         const blobName = req.file?.fieldname + "_" + Date.now() + path.extname(req.file.originalname);
-
         data={...data, image:blobName }
     }
+
       
     actualizarImagen(id_product, data, buffer);
   
@@ -106,9 +100,8 @@ const actualizarImagen = (id_product, data, buffer) => {
         {
             console.log('Si viene la imagen')
         
-            const response = await containerClient.getBlockBlobClient(nombreImagenBD).deleteIfExists();
-            console.log(response);
-            await containerClient.getBlockBlobClient(imagenProyecto).uploadData(buffer);
+            await _blobService.deleteImage(nombreImagenBD);
+            await _blobService.updloadImage(imagenProyecto, buffer);
         }
     });
 };
@@ -129,8 +122,7 @@ const eliminarImagen = async (id_product) => {
     
  
         const nombreImagen = resultado[0].image;
-        const response = await containerClient.getBlockBlobClient(nombreImagen).deleteIfExists();
-        console.log(response);
+       await _blobService.deleteImage(nombreImagen);
     });
 };
   
