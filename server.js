@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const conexion = require("./database");
 const app = express();
 const sucursalRoutes = require("./routes/route-sucursales/sucursales-routes");
@@ -13,15 +14,9 @@ const compraRoutes = require("./routes/route-compra/compra-routes");
 const usuarioRoutes = require("./routes/route-usuario/usuario-routes");
 const authRoutes = require("./routes/route-auth/auth-routes");
 
+// Add the 'cors' middleware
+app.use(cors({ origin: "http://localhost:3000" }));
 
-
-const cors = require("cors");
-
-app.use(
-  cors({
-    origin: "http://localhost:3000",
-  })
-);
 app.use(express.json());
 app.use(express.static("public"));
 
@@ -33,7 +28,6 @@ app.listen(app.get("port"), () => {
 });
 
 ///ROUTES -------------------------------
-
 
 app.use("/sucursales", sucursalRoutes);
 app.use("/proveedores", proveedorRoutes);

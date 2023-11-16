@@ -1,14 +1,25 @@
 const conexion = require("../database");
-const fs = require('fs'); //interactua con los archivos del proyecto
+const config = require('dotenv');
+config.config();
+const path = require("path");
+const _blobService = require("../blobservices");
 
+const log = require("../log");
 
 const createProducto = async (req, res) => {
+    const blobName = req.file?.fieldname + "_" + Date.now() + path.extname(req.file.originalname);
+    const {buffer} = req.file;
+
+    log.logger.info("Blob name ---->" , blobName);
+    log.logger.info("Buffer ---->" , buffer);
+
+    await _blobService.updloadImage(blobName,buffer);
     var data = {
         product_name: req.body.product_name,
         product_price: req.body.product_price,
         id_ofert: req.body.id_ofert,
         id_type_category : req.body.id_type_category,
-        image: req.file.filename,
+        image: blobName,
     };
   
     conexion.query("INSERT INTO product SET ?", [data], (err) => {
@@ -36,6 +47,7 @@ const deleteProducto = async (req, res) => {
 
 const updateProducto = (req, res) => {
     var id_product = req.params.id_product;
+    const {buffer} = req.file;
     //console.log(req.body);
     var data = {
         product_name: req.body.product_name,
@@ -44,11 +56,13 @@ const updateProducto = (req, res) => {
         id_type_category : req.body.id_type_category,
     };
 
-    if(req?.file?.filename !== undefined){
-        data={...data, image:req.file.filename }
+    if(req?.file?.originalname !== undefined){
+        const blobName = req.file?.fieldname + "_" + Date.now() + path.extname(req.file.originalname);
+        data={...data, image:blobName }
     }
+
       
-    actualizarImagen(id_product, data);
+    actualizarImagen(id_product, data, buffer);
   
     conexion.query("UPDATE product SET ? WHERE id_product = ?", [data, id_product], (err) => {
         if (err) 
@@ -61,9 +75,9 @@ const updateProducto = (req, res) => {
 
 
 
-const actualizarImagen = (id_product, data) => {
+const actualizarImagen = (id_product, data, buffer) => {
     // Consulta para obtener el nombre de la imagen
-    conexion.query("SELECT image FROM product WHERE id_product = ?", [id_product], (err, resultado) => {
+    conexion.query("SELECT image FROM product WHERE id_product = ?", [id_product], async (err, resultado) => {
         if (err) 
         {
             console.error('Error al obtener el nombre de la imagen:', err);
@@ -85,25 +99,17 @@ const actualizarImagen = (id_product, data) => {
         else
         {
             console.log('Si viene la imagen')
-           
-            const rutaImagen = `public/images/${nombreImagenBD}`;
-            console.log('ruta: ', rutaImagen);
-      
-            fs.unlink(rutaImagen, (error) => {
-              if (error) 
-              {
-                console.error('Error al eliminar la imagen:', error);
-              }
-              console.log('Imagen eliminada exitosamente');
-            });
+        
+            await _blobService.deleteImage(nombreImagenBD);
+            await _blobService.updloadImage(imagenProyecto, buffer);
         }
     });
 };
 
 
-const eliminarImagen = (id_product) => {
+const eliminarImagen = async (id_product) => {
     // Consulta para obtener el nombre de la imagen
-    conexion.query("SELECT image FROM product WHERE id_product = ?", [id_product], (err, resultado) => {
+    conexion.query("SELECT image FROM product WHERE id_product = ?", [id_product], async (err, resultado) => {
         if (err) 
         {
             console.error('Error al obtener el nombre de la imagen:', err);
@@ -114,16 +120,9 @@ const eliminarImagen = (id_product) => {
             console.error('Imagen no encontrada');
         }
     
+ 
         const nombreImagen = resultado[0].image;
-        const rutaImagen = `public/images/${nombreImagen}`;
-            // Elimina la imagen del proyecto
-        fs.unlink(rutaImagen, (error) => {
-            if (error) 
-            {
-            console.error('Error al eliminar la imagen:', error);
-            }
-            console.log('Imagen eliminada exitosamente');
-        });
+       await _blobService.deleteImage(nombreImagen);
     });
 };
   

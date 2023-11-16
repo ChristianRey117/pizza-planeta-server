@@ -1,21 +1,11 @@
 const multer = require("multer");
-const path = require("path");
 
 const express = require("express");
 const routes = express.Router();
 const conexion = require("../../database");
 
-const storage = multer.diskStorage({
-  destination: "public/images",
-  filename: (req, file, cb) => {
-    cb(
-      null,      file.fieldname + "_" + Date.now() + path.extname(file.originalname)
-    );
-  },
-});
-
 const uploadImage = multer({
-  storage: storage, //configuracion de la carpeta donde se guardaran los archivos subidos por el usuario
+  storage: multer.memoryStorage(), //configuracion de la carpeta donde se guardaran los archivos subidos por el usuario
 });
 
 const controller = require("../../controller/customController");
@@ -38,25 +28,6 @@ routes.get("/", (req, res) => {
     }
   );
 });
-
-
-/***ANTIGUO GET */
-
-
-/*
-routes.get("/", (req, res) => {
-  conexion.query(
-    "SELECT branch.id_branch, branch.branch_name, branch.branch_direction, branch.work_personnel, branch.image " +
-      "FROM branch" ,
-    (err, rows) => {
-      if (err) {
-        res.send({ err: "Error al conectar con la base de datos" });
-      }
-      res.json(rows);
-    }
-  );
-});
-*/
 
 
 routes.get("/:id_branch", (req, res) =>{

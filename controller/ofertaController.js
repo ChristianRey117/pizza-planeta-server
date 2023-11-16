@@ -1,14 +1,33 @@
+
 const conexion = require("../database");
 const fs = require('fs'); //interactua con los archivos del proyecto
+const config = require('dotenv');
+config.config();
+const path = require("path");
+const _blobService = require("../blobservices");
+
+
+const log = require("../log");
 
 
 const createOferta = async (req, res) => {
+
+    const blobName = req.file?.fieldname + "_" + Date.now() + path.extname(req.file.originalname);
+    const {buffer} = req.file;
+
+    log.logger.info("Blob name ---->" , blobName);
+    log.logger.info("Buffer ---->" , buffer);
+
+    await _blobService.updloadImage(blobName,buffer);
+
     var data = {
         name_ofert: req.body.name_ofert,
         discount: req.body.discount,
         description: req.body.description,
-        image: req.file.filename,
+        image: blobName,
     };
+
+    log.logger.info("data ---->" , data);
     conexion.query("INSERT INTO ofert SET ?", [data], (err) => {
         if (err) 
         {
@@ -16,6 +35,8 @@ const createOferta = async (req, res) => {
         }
         res.send("Registro exitoso");
     });
+
+    
 };
 
 
@@ -34,18 +55,25 @@ const deleteOferta = async (req, res) => {
 
 const updateOferta = (req, res) => {
     var id_ofert = req.params.id_ofert;
+    const {buffer} = req.file;
+    console.log("Buffer ---->" , buffer);
+
     var data = {
         name_ofert: req.body.name_ofert,
         discount: req.body.discount,
         description: req.body.description,
     };
 
-    if(req?.file?.filename !== undefined){
-        data={...data, image:req.file.filename }
+    if(req?.file?.originalname !== undefined){
+        const blobName = req.file?.fieldname + "_" + Date.now() + path.extname(req.file.originalname);
+
+        data={...data, image:blobName }
     }
       
-    actualizarImagen(id_ofert, data);
-  
+    actualizarImagen(id_ofert, data, buffer);
+
+
+
     conexion.query("UPDATE ofert SET ? WHERE id_ofert = ?", [data, id_ofert], (err) => {
         if (err) 
         {
@@ -57,8 +85,8 @@ const updateOferta = (req, res) => {
 
 
 
-const actualizarImagen = (id_ofert, data) => {
-    conexion.query("SELECT image FROM ofert WHERE id_ofert = ?", [id_ofert], (err, resultado) => {
+const actualizarImagen = (id_ofert, data, buffer) => {
+    conexion.query("SELECT image FROM ofert WHERE id_ofert = ?", [id_ofert], async (err, resultado) => {
         if (err) 
         {
             console.error('Error al obtener el nombre de la imagen:', err);
@@ -78,22 +106,16 @@ const actualizarImagen = (id_ofert, data) => {
         }
         else
         {
-            const rutaImagen = `public/images/${nombreImagenBD}`;
-            //console.log('ruta: ', rutaImagen);
-            fs.unlink(rutaImagen, (error) => {
-              if (error) 
-              {
-                console.error('Error al eliminar la imagen:', error);
-              }
-              console.log('Imagen eliminada exitosamente');
-            });
+            await _blobService.deleteImage(nombreImagenBD);
+            await _blobService.updloadImage(imagenProyecto,buffer);
+
         }
     });
 };
 
 
-const eliminarImagen = (id_ofert) => {
-    conexion.query("SELECT image FROM ofert WHERE id_ofert = ?", [id_ofert], (err, resultado) => {
+const eliminarImagen = async (id_ofert) => {
+    conexion.query("SELECT image FROM ofert WHERE id_ofert = ?", [id_ofert],  async (err, resultado) => {
         if (err) 
         {
             console.error('Error al obtener el nombre de la imagen:', err);
@@ -105,14 +127,7 @@ const eliminarImagen = (id_ofert) => {
         }
     
         const nombreImagen = resultado[0].image;
-        const rutaImagen = `public/images/${nombreImagen}`;
-        fs.unlink(rutaImagen, (error) => {
-            if (error) 
-            {
-                console.error('Error al eliminar la imagen:', error);
-            }
-            console.log('Imagen eliminada exitosamente');
-        });
+        await _blobService.deleteImage(nombreImagen);
     });
 };
 
