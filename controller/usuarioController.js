@@ -1,7 +1,8 @@
 const conexion = require("../database");
 const bcrypt = require('bcryptjs'); // maneja el encriptado
+const emailController = require('./emailController.js');
 
-const createUsuario = async(req, res) => {
+const createUsuario = async (req, res) => {
     var data = {
         user_name: req.body.user_name,
         phone: req.body.phone,
@@ -29,11 +30,26 @@ const createUsuario = async(req, res) => {
             } 
             else 
             {
-                conexion.query("INSERT INTO user SET ?", [data], (err) => {
+                conexion.query("INSERT INTO user SET ?", [data], async(err) => {
                     if (err) {
                         res.send({ err: "Error al conectar con la base de datos" });
                     }
-                    res.send("Registro exitoso");
+                    else{
+                        //se envia el correo del usuario a sendConfirmationEmail
+                        const correo = data.user_email;
+                        const usuario = data.user_name;
+                        const emailSent = await emailController.sendConfirmationEmail(correo, usuario);
+                        if(emailSent)
+                        {
+                            res.send("Registro exitoso. Se ha enviado un correo a tu cuenta de correo");
+                        }
+                        else
+                        {
+                            console.log(err);
+                            //res.send({ err: "Error al enviar el correo." });
+                        }                       
+                    }
+                   
                 });
             }
         });
