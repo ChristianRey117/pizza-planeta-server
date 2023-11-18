@@ -83,18 +83,27 @@ const deleteCompra = async (req, res) => {
 
 const updateStatus = async (req, res) => {
     const  id_User = req.params.id_user;
+    const ids_compras = JSON.parse(req.body.ids_compras);
     
     const data = {
-        id_status: req.body.id_status,
+        id_status: req.body.status_compra,
     };
+    console.log('id_user-->', id_User)
 
-    conexion.query("UPDATE buy SET ? WHERE id_user = ? AND id_status = 1 OR id_status = 2", [data, id_User], (err, row) => {
-        if (err) 
-        {
-            res.send({ err: "Error al conectar con la base de datos" });
-        }
-        res.send("Actualizacion de estatus exitosa");
-    });
+    console.log('data-->', data)
+
+    ids_compras.forEach(id_compra=>{
+    
+        conexion.query("UPDATE buy SET ? WHERE id_user = ? AND id_buy = ? AND id_status = 1 OR id_status = 2", [data, id_User, id_compra], (err, row) => {
+            if (err) 
+            {
+                res.send({ err: "Error al conectar con la base de datos" });
+            }
+            res.send("Actualizacion de estatus exitosa");
+        });
+    })
+
+    
 };
 
 
