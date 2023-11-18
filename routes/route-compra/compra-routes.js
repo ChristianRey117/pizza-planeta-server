@@ -16,10 +16,12 @@ routes.get('/', (req, res) => {
         "DATE_FORMAT(buy.date, '%d-%m-%y %H:%i:%s') AS date, " +
         "user.user_name AS user, " +
         "product.product_name AS product, " +
-        "product.image AS image " +
+        "product.image AS image, " +
+        "status.status_name AS status " +
         "FROM buy " +
         "JOIN user ON buy.id_user = user.id_users " +
-        "JOIN product ON buy.id_product = product.id_product ", 
+        "JOIN product ON buy.id_product = product.id_product " + 
+        "JOIN status ON buy.id_status = status.id_status ", 
         (err, rows) => {
             if(err)
             {
@@ -41,15 +43,18 @@ routes.get('/usuario/:id_user', (req, res) => {
         "product.product_name AS product, " +
         "product.image AS image, " +
         "product.product_price AS price, " +
-        "buy.total_buy " +
+        "buy.total_buy, " +
+        "status.status_name AS status " +
         "FROM buy " +
         "JOIN user ON buy.id_user = user.id_users " +
         "JOIN product ON buy.id_product = product.id_product " +
+        "JOIN status ON buy.id_status = status.id_status " +
         "WHERE id_user = ?",
         [id_user], (err, rows) => {
             if(err)
             {
-                res.send({err:'error al obtener la consulta'});
+               res.send({err:'error al obtener la consulta'});
+               console.log(err)
 
             }
             var compras = [];
@@ -102,5 +107,6 @@ function convertirCadenasAFechas(array) {
 
 routes.post("/add", uploadImage.none("image"), controller.createCompra);
 routes.delete("/delete/:id_buy", controller.deleteCompra);
+routes.put("/update/:id_user", uploadImage.single("image"), controller.updateStatus);
 
 module.exports = routes;

@@ -13,7 +13,7 @@ const sendConfirmationEmail = async (userEmail, usuario) => {
     });
 
     const estructuraCorreo = {
-        from: `Pizza Planeta ${process.env.EMAIL_USER}`,
+        from: "Pizza Planeta <pizzaplanetacompany@gmail.com>",
         to: userEmail,
         subject: '¡Bienvenid@ Austronauta!',
         text: 'Gracias por registrarte a Pizza Planeta. Tu cuenta ha sido creada exitosamente.',
@@ -101,7 +101,7 @@ const sendCompraEmail = async (correoUsuario) => {
     });
 
     const estructuraCorreoCompra = {
-        from: `Pizza Planeta ${process.env.EMAIL_USER}`,
+        from: "Pizza Planeta <pizzaplanetacompany@gmail.com>",
         to: correoUsuario,
         subject: 'Se ha registrado una compra',
         text: 'Gracias por comprar en Pizza Planeta.',
