@@ -13,6 +13,7 @@ const tipousuarioRoutes = require("./routes/route-tipo-usuario/tipo-usuario-rout
 const compraRoutes = require("./routes/route-compra/compra-routes");
 const usuarioRoutes = require("./routes/route-usuario/usuario-routes");
 const authRoutes = require("./routes/route-auth/auth-routes");
+const stripeRoutes = require("./routes/route-stripe/stripe-routes");
 
 // Add the 'cors' middleware
 app.use(cors({ origin: "http://localhost:3000" }));
@@ -39,5 +40,6 @@ app.use('/ofertas', ofertaRoutes);
 app.use('/tipousuario', tipousuarioRoutes);
 app.use('/compras', compraRoutes);
 app.use('/usuario', usuarioRoutes);
+app.use('/stripe', stripeRoutes);
 app.use('/', authRoutes);
 
