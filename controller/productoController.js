@@ -47,7 +47,6 @@ const deleteProducto = async (req, res) => {
 
 const updateProducto = (req, res) => {
     var id_product = req.params.id_product;
-    const {buffer} = req.file;
     //console.log(req.body);
     var data = {
         product_name: req.body.product_name,
@@ -57,12 +56,14 @@ const updateProducto = (req, res) => {
     };
 
     if(req?.file?.originalname !== undefined){
+        const {buffer} = req.file;
         const blobName = req.file?.fieldname + "_" + Date.now() + path.extname(req.file.originalname);
         data={...data, image:blobName }
+        actualizarImagen(id_product, data, buffer);
+
     }
 
       
-    actualizarImagen(id_product, data, buffer);
   
     conexion.query("UPDATE product SET ? WHERE id_product = ?", [data, id_product], (err) => {
         if (err) 

@@ -55,8 +55,6 @@ const deleteOferta = async (req, res) => {
 
 const updateOferta = (req, res) => {
     var id_ofert = req.params.id_ofert;
-    const {buffer} = req.file;
-    console.log("Buffer ---->" , buffer);
 
     var data = {
         name_ofert: req.body.name_ofert,
@@ -65,12 +63,14 @@ const updateOferta = (req, res) => {
     };
 
     if(req?.file?.originalname !== undefined){
+        const {buffer} = req.file;
+        console.log("Buffer ---->" , buffer);
         const blobName = req.file?.fieldname + "_" + Date.now() + path.extname(req.file.originalname);
+        data={...data, image:blobName };
+        actualizarImagen(id_ofert, data, buffer);
 
-        data={...data, image:blobName }
     }
       
-    actualizarImagen(id_ofert, data, buffer);
 
 
 

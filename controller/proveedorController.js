@@ -37,8 +37,7 @@ const deleteProveedor = async (req, res) => {
 
 const updateProveedor = (req, res) => {
     var id_supplier = req.params.id_supplier;
-    const {buffer} = req.file;
-    console.log("Buffer ---->" , buffer);
+  
 
     var data = {
           supplier_name: req.body.supplier_name,
@@ -46,10 +45,13 @@ const updateProveedor = (req, res) => {
       };
     
     if(req?.file?.originalname !== undefined){
+      const {buffer} = req.file;
+      console.log("Buffer ---->" , buffer);
       data={...data, image:req.file.fieldname + "_" + Date.now() + path.extname(req.file.originalname) }
+      actualizarImagen(id_supplier, data, buffer);
+
     }
     
-  actualizarImagen(id_supplier, data, buffer);
 
   conexion.query("UPDATE supplier SET ? WHERE id_supplier = ?", [data, id_supplier], (err) => {
     if (err) 
