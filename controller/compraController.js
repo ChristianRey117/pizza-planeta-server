@@ -16,9 +16,12 @@ const createCompra = async (req, res) => {
             id_user : req.body.id_user ,
             id_product : element.id_product ,
             date: currentDateTime,
-            ammount: element.quantity
+            ammount: element.quantity,
+            id_status: element.id_status || 1,
         };
         data = {...data, total_buy: element.product_price };
+
+        console.log(data);
 
         conexion.query("INSERT INTO buy SET ?", [data], (err, result) => {
             if (err) 
@@ -78,6 +81,31 @@ const deleteCompra = async (req, res) => {
 };
 
 
+const updateStatus = async (req, res) => {
+    const  id_User = req.params.id_user;
+    const ids_compras = JSON.parse(req.body.ids_compras);
+    
+    const data = {
+        id_status: req.body.status_compra,
+    };
+    console.log('id_user-->', id_User)
+
+    console.log('data-->', data)
+
+    ids_compras.forEach(id_compra=>{
+    
+        conexion.query("UPDATE buy SET ? WHERE id_user = ? AND id_buy = ? AND id_status = 1 OR id_status = 2", [data, id_User, id_compra], (err, row) => {
+            if (err) 
+            {
+                res.send({ err: "Error al conectar con la base de datos" });
+            }
+            res.send("Actualizacion de estatus exitosa");
+        });
+    })
+
+    
+};
 
 
-module.exports = {createCompra, deleteCompra};
+
+module.exports = {createCompra, deleteCompra, updateStatus};

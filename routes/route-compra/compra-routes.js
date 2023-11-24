@@ -16,10 +16,13 @@ routes.get('/', (req, res) => {
         "DATE_FORMAT(buy.date, '%d-%m-%y %H:%i:%s') AS date, " +
         "user.user_name AS user, " +
         "product.product_name AS product, " +
-        "product.image AS image " +
+        "product.image AS image, " +
+        "buy.id_status, " +
+        "status.status_name AS status " +
         "FROM buy " +
         "JOIN user ON buy.id_user = user.id_users " +
-        "JOIN product ON buy.id_product = product.id_product ", 
+        "JOIN product ON buy.id_product = product.id_product " + 
+        "JOIN status ON buy.id_status = status.id_status ", 
         (err, rows) => {
             if(err)
             {
@@ -41,15 +44,19 @@ routes.get('/usuario/:id_user', (req, res) => {
         "product.product_name AS product, " +
         "product.image AS image, " +
         "product.product_price AS price, " +
-        "buy.total_buy " +
+        "buy.total_buy, " +
+        "buy.id_status, " +
+        "status.status_name AS status " +
         "FROM buy " +
         "JOIN user ON buy.id_user = user.id_users " +
         "JOIN product ON buy.id_product = product.id_product " +
+        "JOIN status ON buy.id_status = status.id_status " +
         "WHERE id_user = ?",
         [id_user], (err, rows) => {
             if(err)
             {
-                res.send({err:'error al obtener la consulta'});
+               res.send({err:'error al obtener la consulta'});
+               console.log(err)
 
             }
             var compras = [];
@@ -98,9 +105,82 @@ function convertirCadenasAFechas(array) {
       });
     });
 }
-  
+
+
+
+//COMPRAS DE TODOS LOS USUARIOS
+routes.get('/usuarios', (req, res) => {
+    conexion.query(
+        "SELECT buy.id_buy, buy.ammount, " +
+        "DATE_FORMAT(buy.date, '%d-%m-%y %H:%i:%s') AS date, " +
+        "buy.id_user, " +
+        "user.user_name AS user, " +
+        "product.product_name AS product, " +
+        "product.image AS image, " +
+        "product.product_price AS price, " +
+        "buy.total_buy, " +
+        "buy.id_status, " +
+        "status.status_name AS status " +
+        "FROM buy " +
+        "JOIN user ON buy.id_user = user.id_users " +
+        "JOIN product ON buy.id_product = product.id_product " +
+        "JOIN status ON buy.id_status = status.id_status " ,
+        (err, rows) => {
+            if(err)
+            {
+               res.send({err:'error al obtener la consulta'});
+               console.log(err)
+
+            }
+            var compras = [];
+            var compra = {};
+            rows.forEach(element => {
+                const fecha = element.date;
+                if(!compra[fecha] )
+                {
+                    compra[fecha] = true;
+                    const elementFecha = rows.filter(objeto => objeto.date === fecha);
+                    compras.push(elementFecha);
+                }
+            });
+
+
+            var orderCompra = convertirCadenasAFechas(compras);
+            orderCompra.sort((a,b)=> b[0].date - a[0].date);
+
+            orderCompra = orderCompra.map(function (subArray) {
+                return subArray.map(function (obj) {
+                  obj.date = obj.date.toLocaleString();
+                  return obj;
+                });
+              });
+            res.json(orderCompra);
+        }
+    );
+  });
+//COMPRAS DE TODOS LOS USUARIOS
+
+
+
+//GET DE ESTATUS
+routes.get('/estatus', (req, res) => {
+    conexion.query(
+        "SELECT status.id_status, status.status_name " +
+        "FROM status ",
+        (err, rows) => {
+            if(err)
+            {
+                res.send({err: "Error al hacer la consulta"});
+            }
+            res.json(rows);
+        }
+    );
+});
+//GET DE ESTATUS
+
 
 routes.post("/add", uploadImage.none("image"), controller.createCompra);
 routes.delete("/delete/:id_buy", controller.deleteCompra);
+routes.put("/update/:id_user", uploadImage.single("image"), controller.updateStatus);
 
 module.exports = routes;
