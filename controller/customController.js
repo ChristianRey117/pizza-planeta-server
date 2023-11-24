@@ -52,7 +52,6 @@ const deleteSucursal = async (req, res) => {
 
 const updateSucursal = (req, res) => {
   var id_branch = req.params.id_branch;
-  const {buffer} = req.file;
 
   var data = {
     branch_name: req.body.branch_name,
@@ -60,13 +59,13 @@ const updateSucursal = (req, res) => {
     work_personnel: req.body.work_personnel
   };
   if(req?.file?.originalname !== undefined){
+    const {buffer} = req.file;
     const blobName = req.file?.fieldname + "_" + Date.now() + path.extname(req.file.originalname);
     data={...data, image:blobName }
+    console.log('Buffer->',buffer);
+    console.log('Data->',data);
+    actualizarImagen(id_branch, data, buffer);
   }
-    
-  console.log('Buffer->',buffer);
-  console.log('Data->',data);
-  actualizarImagen(id_branch, data, buffer);
 
   if(req.body.ids_supliers) 
   {
