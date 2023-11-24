@@ -18,11 +18,13 @@ routes.get('/', (req, res) => {
         "product.product_name AS product, " +
         "product.image AS image, " +
         "buy.id_status, " +
-        "status.status_name AS status " +
+        "status.status_name AS status, " +
+        "status_item " +
         "FROM buy " +
         "JOIN user ON buy.id_user = user.id_users " +
         "JOIN product ON buy.id_product = product.id_product " + 
-        "JOIN status ON buy.id_status = status.id_status ", 
+        "JOIN status ON buy.id_status = status.id_status " + 
+        "WHERE status_item = 'activo' ", 
         (err, rows) => {
             if(err)
             {
@@ -46,12 +48,13 @@ routes.get('/usuario/:id_user', (req, res) => {
         "product.product_price AS price, " +
         "buy.total_buy, " +
         "buy.id_status, " +
-        "status.status_name AS status " +
+        "status.status_name AS status, " +
+        "status_item " +
         "FROM buy " +
         "JOIN user ON buy.id_user = user.id_users " +
         "JOIN product ON buy.id_product = product.id_product " +
         "JOIN status ON buy.id_status = status.id_status " +
-        "WHERE id_user = ?",
+        "WHERE id_user = ? AND status_item = 'activo'",
         [id_user], (err, rows) => {
             if(err)
             {
@@ -120,11 +123,13 @@ routes.get('/usuarios', (req, res) => {
         "product.product_price AS price, " +
         "buy.total_buy, " +
         "buy.id_status, " +
-        "status.status_name AS status " +
+        "status.status_name AS status, " +
+        "status_item " +
         "FROM buy " +
         "JOIN user ON buy.id_user = user.id_users " +
         "JOIN product ON buy.id_product = product.id_product " +
-        "JOIN status ON buy.id_status = status.id_status " ,
+        "JOIN status ON buy.id_status = status.id_status " +
+        "WHERE status_item = 'activo'",
         (err, rows) => {
             if(err)
             {
@@ -180,7 +185,7 @@ routes.get('/estatus', (req, res) => {
 
 
 routes.post("/add", uploadImage.none("image"), controller.createCompra);
-routes.delete("/delete/:id_buy", controller.deleteCompra);
+routes.put("/delete", uploadImage.none("image") ,controller.deleteCompra);
 routes.put("/update/:id_user", uploadImage.single("image"), controller.updateStatus);
 
 module.exports = routes;
