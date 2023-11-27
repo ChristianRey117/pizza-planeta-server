@@ -18,6 +18,7 @@ const createCompra = async (req, res) => {
             date: currentDateTime,
             ammount: element.quantity,
             id_status: element.id_status || 1,
+            status_item: element.status_item || 'activo',
         };
         data = {...data, total_buy: element.product_price };
 
@@ -70,14 +71,21 @@ const correo = async (idUser) =>
 
 
 const deleteCompra = async (req, res) => {
-    var id_buy = req.params.id_buy;
-    conexion.query("DELETE FROM buy WHERE id_buy = ?", [id_buy], (err) => {
-        if (err) {
-            res.send({err:'Error al eliminar el registro:'},);
-        } else {
-            res.send('Registro eliminado exitosamente');
-        }
-    });
+    var ids_buy = JSON.parse(req.body.data);
+    console.log('id compra--->' ,req.body);
+    ids_buy.forEach((id, index)=>{
+        conexion.query("UPDATE buy SET status_item = 'inactivo' WHERE id_buy = ?", [id], (err) => {
+           if(index == ids_buy.length -1){
+            if (err) {
+                res.send({err:'Error al actualizar Estatus de Item'});
+            } else {
+                res.send('Estatus de Item actualizado exitosamente');
+            }
+           }
+        });
+    })
+
+    
 };
 
 
