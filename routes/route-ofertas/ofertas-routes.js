@@ -18,8 +18,10 @@ const log = require("../../log");
 
 routes.get('/', (req, res) => {
     conexion.query(
-        "SELECT ofert.id_ofert, ofert.name_ofert, ofert.discount, ofert.description, ofert.image " +
-        "FROM ofert ",
+        "SELECT ofert.id_ofert, ofert.name_ofert, ofert.discount, ofert.description, ofert.image, " +
+        "status_item " +
+        "FROM ofert " +
+        "WHERE status_item = 'activo' ",
         (err, rows) => {
             if(err)
             {
@@ -33,9 +35,10 @@ routes.get('/', (req, res) => {
 routes.get('/:id_ofert', (req, res) => {
     var idOfert = req.params.id_ofert;
     conexion.query(
-        "SELECT ofert.id_ofert, ofert.name_ofert, ofert.discount, ofert.description, ofert.image " +
+        "SELECT ofert.id_ofert, ofert.name_ofert, ofert.discount, ofert.description, ofert.image, " +
+        "status_item " +
         "FROM ofert " +
-        "WHERE ofert.id_ofert = ?",
+        "WHERE ofert.id_ofert = ? AND status_item = 'activo'",
         [idOfert],(err, rows) => {
             if(err)
             {
@@ -47,7 +50,7 @@ routes.get('/:id_ofert', (req, res) => {
 });
 
 routes.post("/add", uploadImage.single("image"), controller.createOferta);
-routes.delete("/delete/:id_ofert", controller.deleteOferta);
+routes.put("/delete/:id_ofert", controller.deleteOferta);
 routes.put("/update/:id_ofert", uploadImage.single("image"), controller.updateOferta);
 routes.get("/logs", (req, res)=>{
     log.logger.query({ order: 'desc', limit: 100 }, 

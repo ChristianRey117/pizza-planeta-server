@@ -14,6 +14,7 @@ const createSucursal = async (req, res, next) => {
     branch_direction: req.body.branch_direction,
     work_personnel: req.body.work_personnel,
     image: blobName,
+    status_item: req.body.status_item || 'activo',
   };
 
   await _blobService.updloadImage(blobName,buffer);
@@ -38,7 +39,7 @@ const deleteSucursal = async (req, res) => {
   eliminarProveedores(id_branch);
   eliminarImagen(id_branch); //se envia el id
 
-  conexion.query("DELETE FROM branch WHERE id_branch = ?", [id_branch], (err) => {
+  conexion.query("UPDATE branch SET status_item = 'inactivo' WHERE id_branch = ?", [id_branch], (err) => {
     if (err) {
       res.send({err:'Error al eliminar el registro:'},);
       console.log('Error al eliminar la sucursal');

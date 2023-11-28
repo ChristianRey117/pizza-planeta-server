@@ -20,6 +20,7 @@ const createProducto = async (req, res) => {
         id_ofert: req.body.id_ofert,
         id_type_category : req.body.id_type_category,
         image: blobName,
+        status_item: req.body.status_item || 'activo',
     };
   
     conexion.query("INSERT INTO product SET ?", [data], (err) => {
@@ -35,8 +36,7 @@ const deleteProducto = async (req, res) => {
     var id_product = req.params.id_product;
     eliminarImagen(id_product); //se envia el id
   
-    //Eliminacion de registro en base de datos
-    conexion.query("DELETE FROM product WHERE id_product = ?", [id_product], (err) => {
+    conexion.query("UPDATE product SET status_item = 'inactivo' WHERE id_product = ?", [id_product], (err) => {
         if (err) {
             res.send({err:'Error al eliminar el registro:'},);
         } else {
