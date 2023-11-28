@@ -16,14 +16,15 @@ routes.get("/", (req, res) => {
     "SELECT branch.id_branch, branch.branch_name, branch.branch_direction, branch.work_personnel, branch.image, " + 
     "GROUP_CONCAT(supplier.id_supplier SEPARATOR ', ') AS ids_suppliers, " +
     "GROUP_CONCAT(supplier.supplier_name SEPARATOR ', ') AS suppliers, " +
-    "status_item " +
+    "supplier.status_item " +
     "FROM branch " +
     "LEFT JOIN supplier_branch ON branch.id_branch = supplier_branch.id_branch " +
     "LEFT JOIN supplier ON supplier_branch.id_supplier = supplier.id_supplier " + 
-    "WHERE status_item = 'activo'  " +
+    "WHERE supplier.status_item = 'activo'  " +
     "GROUP BY branch.id_branch ",
     (err, rows) => {
       if (err) {
+        console.log(err);
         res.send({ err: "Error al conectar con la base de datos" });
       }
       res.json(rows);

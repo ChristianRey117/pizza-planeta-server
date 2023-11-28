@@ -3,6 +3,7 @@ const conexion = require("../database");
 const createTipoUsuario = async (req, res) => {
     var data = {
         type_users_name : req.body.type_users_name,
+        status_item: req.body.status_item || 'activo',
     };
     
     conexion.query("INSERT INTO type_user SET ?", [data], (err) => {
@@ -31,7 +32,7 @@ const updateTipoUsuario = (req, res) => {
 
 const deleteTipoUsuario = async (req, res) => {
     var id_type_users = req.params.id_type_users;
-    conexion.query("DELETE FROM type_user WHERE id_type_users = ?", [id_type_users], (err) => {
+    conexion.query("UPDATE  type_user SET status_item = 'inactivo' WHERE id_type_users = ?", [id_type_users], (err) => {
         if (err) {
             res.send({err:'Error al eliminar el registro:'},);
         } else {

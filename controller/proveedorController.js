@@ -10,7 +10,8 @@ const createProveedor = async(req, res) => {
     var data = {
         supplier_name: req.body.supplier_name,
         supplier_product: req.body.supplier_product,
-        image: blobName
+        image: blobName,
+        status_item: req.body.status_item || 'activo',
     };
 
     await _blobService.updloadImage(blobName,buffer);
@@ -26,7 +27,7 @@ const createProveedor = async(req, res) => {
 const deleteProveedor = async (req, res) => {
     var id_supplier = req.params.id_supplier;
     eliminarImagen(id_supplier);
-    conexion.query("DELETE FROM supplier WHERE id_supplier = ?", [id_supplier], (err) => {
+    conexion.query("UPDATE supplier SET status_item = 'inactivo' WHERE id_supplier = ?", [id_supplier], (err) => {
         if (err) {
           res.send({err:'Error al eliminar el registro:'},);
         } else {

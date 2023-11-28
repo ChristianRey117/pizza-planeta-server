@@ -4,6 +4,7 @@ const createTipoCategoria = async (req, res) => {
     var data = {
         name_category: req.body.name_category,
         description : req.body.description,
+        status_item: req.body.status_item || 'activo',
     };
     
     conexion.query("INSERT INTO type_category SET ?", [data], (err) => {
@@ -17,7 +18,7 @@ const createTipoCategoria = async (req, res) => {
 
 const deleteTipoCategoria = async (req, res) => {
     var id_category = req.params.id_category;
-    conexion.query("DELETE FROM type_category WHERE id_category = ?", [id_category], (err) => {
+    conexion.query("UPDATE type_category SET status_item = 'inactivo' WHERE id_category = ?", [id_category], (err) => {
         if (err) {
             res.send({err:'Error al eliminar el registro:'},);
         } else {

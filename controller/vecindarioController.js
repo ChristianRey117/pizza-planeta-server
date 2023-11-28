@@ -4,6 +4,7 @@ const createVecindario = async (req, res) => {
     var data = {
         id_branch: req.body.id_branch,
         neighborhood_name : req.body.neighborhood_name,
+        status_item: req.body.status_item || 'activo',
     };
     
     conexion.query("INSERT INTO neighborhood SET ?", [data], (err) => {
@@ -17,7 +18,7 @@ const createVecindario = async (req, res) => {
 
 const deleteVecindario = async (req, res) => {
     var id_neighborhood = req.params.id_neighborhood;
-    conexion.query("DELETE FROM neighborhood WHERE id_neighborhood = ?", [id_neighborhood], (err) => {
+    conexion.query("UPDATE neighborhood SET status_item = 'inactivo' WHERE id_neighborhood = ?", [id_neighborhood], (err) => {
         if (err) {
             res.send({err:'Error al eliminar el registro:'},);
         } else {
