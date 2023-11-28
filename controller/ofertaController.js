@@ -25,6 +25,7 @@ const createOferta = async (req, res) => {
         discount: req.body.discount,
         description: req.body.description,
         image: blobName,
+        status_item: req.body.status_item || 'activo',
     };
 
     log.logger.info("data ---->" , data);
@@ -43,7 +44,7 @@ const createOferta = async (req, res) => {
 const deleteOferta = async (req, res) => {
     var id_ofert = req.params.id_ofert;
     eliminarImagen(id_ofert); 
-    conexion.query("DELETE FROM ofert WHERE id_ofert = ?", [id_ofert], (err) => {
+    conexion.query("UPDATE ofert SET status_item = 'inactivo' WHERE id_ofert = ?", [id_ofert], (err) => {
         if (err) {
             res.send({err:'Error al eliminar el registro:'},);
         } else {

@@ -13,8 +13,10 @@ const uploadImage = multer({
 
 routes.get('/', (req, res) => {
     conexion.query(
-        "SELECT type_category.id_category, type_category.name_category, type_category.description " +
-        "FROM type_category ", 
+        "SELECT type_category.id_category, type_category.name_category, type_category.description,  " +
+        "status_item " +
+        "FROM type_category " +
+        "WHERE status_item = 'activo' ", 
         (err, rows) => {
             if(err)
             {
@@ -28,9 +30,10 @@ routes.get('/', (req, res) => {
 routes.get('/:id_category', (req, res) => {
     var id = req.params.id_category;
     conexion.query(
-        "SELECT type_category.id_category, type_category.name_category, type_category.description " +
+        "SELECT type_category.id_category, type_category.name_category, type_category.description, " +
+        "status_item " +
         "FROM type_category " +
-        "WHERE type_category.id_category = ?", 
+        "WHERE type_category.id_category = ? AND status_item = 'activo'", 
         [id], (err, rows) => {
             if(err)
             {
@@ -42,7 +45,7 @@ routes.get('/:id_category', (req, res) => {
 });
 
 routes.post("/add", uploadImage.none("image"),controller.createTipoCategoria);
-routes.delete("/delete/:id_category",controller.deleteTipoCategoria);
+routes.put("/delete/:id_category",controller.deleteTipoCategoria);
 routes.put("/update/:id_category", uploadImage.none("image"),controller.updateTipoCategoria);
 
 module.exports = routes;

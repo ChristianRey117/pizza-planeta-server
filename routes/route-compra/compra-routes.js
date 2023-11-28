@@ -19,12 +19,12 @@ routes.get('/', (req, res) => {
         "product.image AS image, " +
         "buy.id_status, " +
         "status.status_name AS status, " +
-        "status_item " +
+        "buy.status_item " +
         "FROM buy " +
         "JOIN user ON buy.id_user = user.id_users " +
         "JOIN product ON buy.id_product = product.id_product " + 
         "JOIN status ON buy.id_status = status.id_status " + 
-        "WHERE status_item = 'activo' ", 
+        "WHERE buy.status_item = 'activo' ", 
         (err, rows) => {
             if(err)
             {
@@ -124,12 +124,12 @@ routes.get('/usuarios', (req, res) => {
         "buy.total_buy, " +
         "buy.id_status, " +
         "status.status_name AS status, " +
-        "status_item " +
+        "buy.status_item " +
         "FROM buy " +
         "JOIN user ON buy.id_user = user.id_users " +
         "JOIN product ON buy.id_product = product.id_product " +
         "JOIN status ON buy.id_status = status.id_status " +
-        "WHERE status_item = 'activo'",
+        "WHERE buy.status_item = 'activo'",
         (err, rows) => {
             if(err)
             {

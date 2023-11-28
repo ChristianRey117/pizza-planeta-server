@@ -14,9 +14,11 @@ const uploadImage = multer({
 routes.get('/', (req, res) => {
     conexion.query(
         "SELECT neighborhood.id_neighborhood, neighborhood_name, " +
-        "branch.branch_name AS branch " +
+        "branch.branch_name AS branch, " +
+        "neighborhood.status_item " +
         "FROM neighborhood " + 
-        "JOIN branch ON neighborhood.id_branch = branch.id_branch",
+        "JOIN branch ON neighborhood.id_branch = branch.id_branch " +
+        "WHERE neighborhood.status_item = 'activo' ", 
         (err, rows) => {
             if(err)
             {
@@ -31,10 +33,11 @@ routes.get('/:id_neighborhood', (req, res) => {
     var id = req.params.id_neighborhood;
     conexion.query(
         "SELECT neighborhood.id_neighborhood, neighborhood_name, neighborhood.id_branch, " +
-        "branch.branch_name AS branch " +
+        "branch.branch_name AS branch, " +
+        "neighborhood.status_item " +
         "FROM neighborhood " + 
         "JOIN branch ON neighborhood.id_branch = branch.id_branch " +
-        "WHERE neighborhood.id_neighborhood = ?",
+        "WHERE neighborhood.id_neighborhood = ? AND neighborhood.status_item = 'activo' ",
         [id],(err, rows) => {
             if(err)
             {
@@ -46,7 +49,7 @@ routes.get('/:id_neighborhood', (req, res) => {
 });
 
 routes.post("/add", uploadImage.none("image"),controller.createVecindario);
-routes.delete("/delete/:id_neighborhood", controller.deleteVecindario);
+routes.put("/delete/:id_neighborhood", controller.deleteVecindario);
 routes.put("/update/:id_neighborhood", uploadImage.none("image"),controller.updateVecindario);
 
 

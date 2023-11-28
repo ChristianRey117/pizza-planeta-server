@@ -9,6 +9,7 @@ const createInventario = async (req, res) => {
         ammountChampi : req.body.ammountChampi,
         ammountPina : req.body.ammountPina,
         ammountChiles : req.body.ammountChiles,
+        status_item: req.body.status_item || 'activo',
     };
     
     conexion.query("INSERT INTO inventory SET ?", [data], (err) => {
@@ -23,7 +24,7 @@ const createInventario = async (req, res) => {
 const deleteInvetario = async (req, res) => {
     var id_inventory = req.params.id_inventory;
     //Eliminacion de registro en base de datos
-    conexion.query("DELETE FROM inventory WHERE id_inventory = ?", [id_inventory], (err) => {
+    conexion.query("UPDATE inventory SET status_item = 'inactivo' WHERE id_inventory = ?", [id_inventory], (err) => {
         if (err) {
             res.send({err:'Error al eliminar el registro:'},);
         } else {

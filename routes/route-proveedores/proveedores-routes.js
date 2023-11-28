@@ -12,8 +12,10 @@ const uploadImage = multer({
 
 routes.get('/', (req, res) => {
   conexion.query(
-    "SELECT supplier.id_supplier, supplier.supplier_name, supplier.supplier_product, supplier.image" +
-    " FROM supplier", 
+    "SELECT supplier.id_supplier, supplier.supplier_name, supplier.supplier_product, supplier.image, " +
+    "status_item " +
+    "FROM supplier " +
+    "WHERE status_item = 'activo' ", 
     (err, rows) => {
       if(err)
       {
@@ -27,9 +29,10 @@ routes.get('/', (req, res) => {
 routes.get('/:id_supplier', (req, res) =>{
   var idSupplier = req.params.id_supplier;
   conexion.query(
-    "SELECT supplier.id_supplier, supplier.supplier_name, supplier.supplier_product, supplier.image" +
-    " FROM supplier" +
-    " WHERE supplier.id_supplier = ?", 
+    "SELECT supplier.id_supplier, supplier.supplier_name, supplier.supplier_product, supplier.image, " +
+    "status_item " +
+    "FROM supplier " +
+    "WHERE supplier.id_supplier =  ?  AND status_item = 'activo' ", 
     [idSupplier], (err, rows) => {
       if(err) 
       {
@@ -41,7 +44,7 @@ routes.get('/:id_supplier', (req, res) =>{
 });
 
 routes.post("/add", uploadImage.single("image"), controller.createProveedor);
-routes.delete("/delete/:id_supplier", controller.deleteProveedor);
+routes.put("/delete/:id_supplier", controller.deleteProveedor);
 routes.put("/update/:id_supplier", uploadImage.single("image"), controller.updateProveedor);
 
 

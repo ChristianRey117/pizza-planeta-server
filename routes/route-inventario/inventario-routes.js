@@ -12,10 +12,13 @@ const uploadImage = multer({
 
 routes.get('/', (req, res) => {
     conexion.query(
-        "SELECT inventory.id_inventory, inventory.ammountQueso, inventory.ammountSalsa, inventory.ammountHarina, inventory.ammountChampi, inventory.ammountPina, inventory.ammountChiles, " + 
-        "branch.branch_name AS branch " +
+        "SELECT inventory.id_inventory, inventory.ammountQueso, inventory.ammountSalsa, inventory.ammountHarina, " +
+        "inventory.ammountChampi, inventory.ammountPina, inventory.ammountChiles, " + 
+        "branch.branch_name AS branch, " +
+        "inventory.status_item " +
         "FROM inventory " +
-        "JOIN branch ON inventory.id_branch = branch.id_branch",
+        "JOIN branch ON inventory.id_branch = branch.id_branch " +
+        "WHERE inventory.status_item = 'activo' ", 
         (err, rows) => {
             if(err)
             {
@@ -29,11 +32,13 @@ routes.get('/', (req, res) => {
 routes.get('/:id_inventory', (req, res) => {
     var idInventory = req.params.id_inventory;
     conexion.query(
-        "SELECT inventory.id_inventory, inventory.ammountQueso, inventory.ammountSalsa, inventory.ammountHarina, inventory.ammountChampi, inventory.ammountPina, inventory.ammountChiles, " + 
-        "branch.branch_name AS branch, inventory.id_branch " +
+        "SELECT inventory.id_inventory, inventory.ammountQueso, inventory.ammountSalsa, inventory.ammountHarina, " + 
+        "inventory.ammountChampi, inventory.ammountPina, inventory.ammountChiles, " + 
+        "branch.branch_name AS branch, inventory.id_branch, " +
+        "inventory.status_item " +
         "FROM inventory " +
         "JOIN branch ON inventory.id_branch = branch.id_branch " +
-        "WHERE inventory.id_inventory = ?",
+        "WHERE inventory.id_inventory = ? AND inventory.status_item = 'activo' ",
         [idInventory], (err, rows) => {
             if(err)
             {
@@ -46,7 +51,7 @@ routes.get('/:id_inventory', (req, res) => {
 
 routes.post("/add", uploadImage.none("image"),controller.createInventario);
 routes.put("/update/:id_inventory", uploadImage.none("image"),controller.updateInvetario);
-routes.delete("/delete/:id_inventory", controller.deleteInvetario);
+routes.put("/delete/:id_inventory", controller.deleteInvetario);
 
 
 
