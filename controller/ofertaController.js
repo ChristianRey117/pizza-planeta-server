@@ -15,8 +15,8 @@ const createOferta = async (req, res) => {
     const blobName = req.file?.fieldname + "_" + Date.now() + path.extname(req.file.originalname);
     const {buffer} = req.file;
 
-    log.logger.info("Blob name ---->" , blobName);
-    log.logger.info("Buffer ---->" , buffer);
+    //log.logger.info("Blob name ---->" , blobName);
+    //log.logger.info("Buffer ---->" , buffer);
 
     await _blobService.updloadImage(blobName,buffer);
 
