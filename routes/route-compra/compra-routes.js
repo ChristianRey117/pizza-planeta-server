@@ -49,12 +49,12 @@ routes.get('/usuario/:id_user', (req, res) => {
         "buy.total_buy, " +
         "buy.id_status, " +
         "status.status_name AS status, " +
-        "status_item " +
+        "buy.status_item " +
         "FROM buy " +
         "JOIN user ON buy.id_user = user.id_users " +
         "JOIN product ON buy.id_product = product.id_product " +
         "JOIN status ON buy.id_status = status.id_status " +
-        "WHERE id_user = ? AND status_item = 'activo'",
+        "WHERE user.id_user = ? AND buy.status_item = 'activo'",
         [id_user], (err, rows) => {
             if(err)
             {

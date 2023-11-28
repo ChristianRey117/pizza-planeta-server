@@ -19,9 +19,9 @@ const log = require("../../log");
 routes.get('/', (req, res) => {
     conexion.query(
         "SELECT ofert.id_ofert, ofert.name_ofert, ofert.discount, ofert.description, ofert.image, " +
-        "status_item " +
+        "ofert.status_item " +
         "FROM ofert " +
-        "WHERE status_item = 'activo' ",
+        "WHERE ofert.status_item = 'activo' ",
         (err, rows) => {
             if(err)
             {
@@ -36,9 +36,9 @@ routes.get('/:id_ofert', (req, res) => {
     var idOfert = req.params.id_ofert;
     conexion.query(
         "SELECT ofert.id_ofert, ofert.name_ofert, ofert.discount, ofert.description, ofert.image, " +
-        "status_item " +
+        "ofert.status_item " +
         "FROM ofert " +
-        "WHERE ofert.id_ofert = ? AND status_item = 'activo'",
+        "WHERE ofert.id_ofert = ? AND ofert.status_item = 'activo'",
         [idOfert],(err, rows) => {
             if(err)
             {

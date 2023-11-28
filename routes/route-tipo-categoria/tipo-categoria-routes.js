@@ -14,9 +14,9 @@ const uploadImage = multer({
 routes.get('/', (req, res) => {
     conexion.query(
         "SELECT type_category.id_category, type_category.name_category, type_category.description,  " +
-        "status_item " +
+        "type_category.status_item " +
         "FROM type_category " +
-        "WHERE status_item = 'activo' ", 
+        "WHERE type_category.status_item = 'activo' ", 
         (err, rows) => {
             if(err)
             {
@@ -31,9 +31,9 @@ routes.get('/:id_category', (req, res) => {
     var id = req.params.id_category;
     conexion.query(
         "SELECT type_category.id_category, type_category.name_category, type_category.description, " +
-        "status_item " +
+        "type_category.status_item " +
         "FROM type_category " +
-        "WHERE type_category.id_category = ? AND status_item = 'activo'", 
+        "WHERE type_category.id_category = ? AND type_category.status_item = 'activo'", 
         [id], (err, rows) => {
             if(err)
             {

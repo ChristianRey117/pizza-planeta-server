@@ -13,10 +13,11 @@ const uploadImage = multer({
 routes.get('/', (req, res) => {
   conexion.query(
     "SELECT supplier.id_supplier, supplier.supplier_name, supplier.supplier_product, supplier.image, " +
-    "status_item " +
+    "supplier.status_item " +
     "FROM supplier " +
-    "WHERE status_item = 'activo' ", 
+    "WHERE supplier.status_item = 'activo' ", 
     (err, rows) => {
+      console.log(err);
       if(err)
       {
         res.send({err: 'Error al conectar con la base de datos'});
@@ -30,9 +31,9 @@ routes.get('/:id_supplier', (req, res) =>{
   var idSupplier = req.params.id_supplier;
   conexion.query(
     "SELECT supplier.id_supplier, supplier.supplier_name, supplier.supplier_product, supplier.image, " +
-    "status_item " +
+    "supplier.status_item " +
     "FROM supplier " +
-    "WHERE supplier.id_supplier =  ?  AND status_item = 'activo' ", 
+    "WHERE supplier.id_supplier =  ?  AND supplier.status_item = 'activo' ", 
     [idSupplier], (err, rows) => {
       if(err) 
       {
