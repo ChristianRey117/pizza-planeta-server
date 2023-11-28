@@ -100,14 +100,18 @@ const updateStatus = async (req, res) => {
 
     console.log('data-->', data)
 
-    ids_compras.forEach(id_compra=>{
+    ids_compras.forEach((id_compra, index)=>{
     
         conexion.query("UPDATE buy SET ? WHERE id_user = ? AND id_buy = ? AND id_status = 1 OR id_status = 2", [data, id_User, id_compra], (err, row) => {
-            if (err) 
-            {
-                res.send({ err: "Error al conectar con la base de datos" });
+            if(index == ids_compras.length -1){
+
+                if (err) 
+                {
+                    res.send({ err: "Error al conectar con la base de datos" });
+                }
+                res.send("Actualizacion de estatus exitosa");
             }
-            res.send("Actualizacion de estatus exitosa");
+            
         });
     })
 
