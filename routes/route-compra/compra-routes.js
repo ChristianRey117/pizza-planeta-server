@@ -36,7 +36,7 @@ routes.get('/', (req, res) => {
 });
 
 //compras segun el Usuario
-routes.get('/usuario/:id_user', (req, res) => {
+routes.get('/usuarios/:id_user', (req, res) => {
     var id_user = req.params.id_user;
   
     conexion.query(
@@ -54,7 +54,7 @@ routes.get('/usuario/:id_user', (req, res) => {
         "JOIN user ON buy.id_user = user.id_users " +
         "JOIN product ON buy.id_product = product.id_product " +
         "JOIN status ON buy.id_status = status.id_status " +
-        "WHERE user.id_user = ? AND buy.status_item = 'activo'",
+        "WHERE user.id_users = ? AND buy.status_item = 'activo'",
         [id_user], (err, rows) => {
             if(err)
             {

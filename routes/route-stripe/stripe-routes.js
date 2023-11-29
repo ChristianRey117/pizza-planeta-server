@@ -80,8 +80,8 @@ routes.post("/", uploadImage.none("image"), async (req, res) => {
         line_items,
         customer_email: user.user_email,
         mode: 'payment',
-        success_url: 'http://localhost:5000/stripe/finalize',
-        cancel_url: 'http://localhost:3000/checkout',
+        success_url: 'https://pizza-planeta-server.azurewebsites.net/stripe/finalize',
+        cancel_url: 'https://pizza-planeta.netlify.app/checkout',
     });
 
     console.log(session.url);
@@ -94,8 +94,8 @@ routes.post("/", uploadImage.none("image"), async (req, res) => {
 
 routes.get('/finalize', uploadImage.none("image"), async(req, res)=>{
     console.log('inicio peticion');
-axios.post('http://localhost:5000/compras/add', dataCompra).then((result) => {
-    res.redirect("http://localhost:3000/compras/usuario/" + dataCompra.id_user);
+axios.post('https://pizza-planeta-server.azurewebsites.net/compras/add', dataCompra).then((result) => {
+    res.redirect("https://pizza-planeta.netlify.app/compras/usuario/" + dataCompra.id_user);
 }).catch((err) => {
     console.log(err);
 });
